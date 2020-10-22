@@ -13,7 +13,7 @@ Affine* create_affine(Matrix* W, Vector* b) {
     return A;
 }
 
-Matrix* affine_forward(Affine* A, Matrix* X) { 
+Matrix* affine_forward(Affine* A, const Matrix* X) { 
     if (A->X != NULL) {
         free_matrix(A->X);
     }
@@ -158,7 +158,7 @@ double softmax_with_loss_forward(SoftmaxWithLoss* sft, const Matrix* X, Vector* 
     return cross_entropy_error(sft->Y, t);
 }
 
-Matrix* softmax_with_loss_backward(SoftmaxWithLoss* sft) {
+Matrix* softmax_with_loss_backward(const SoftmaxWithLoss* sft) {
     Matrix* dX = create_matrix(sft->Y->rows, sft->Y->cols);
     for (int i = 0; i < dX->rows; ++i) {
         for (int j = 0; j < dX->cols; ++j) {

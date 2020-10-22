@@ -33,7 +33,7 @@ struct SoftmaxWithLoss {
 };
 
 Affine* create_affine(Matrix* W, Vector* b);
-Matrix* affine_forward(Affine* A, Matrix* X);
+Matrix* affine_forward(Affine* A, const Matrix* X);
 Matrix* affine_backward(Affine* A, const Matrix* D);
 
 Relu* create_relu(int rows, int cols);
@@ -42,6 +42,6 @@ Matrix* relu_backward(Relu* R, const Matrix* D);
 
 SoftmaxWithLoss* create_softmax_with_loss();
 double softmax_with_loss_forward(SoftmaxWithLoss* sft, const Matrix* X, Vector* t);
-Matrix* softmax_with_loss_backward(SoftmaxWithLoss* sft);
+Matrix* softmax_with_loss_backward(const SoftmaxWithLoss* sft);
 
 #endif
