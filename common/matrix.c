@@ -187,6 +187,14 @@ Matrix* dot_matrix(const Matrix* M, const Matrix* N) {
     return A;
 }
 
+void scalar_matrix(Matrix* M, double k) {
+    for (int i = 0; i < M->rows; ++i) {
+       for (int j = 0; j < M->cols; ++j) {
+            M->elements[i][j] *= k;
+       }
+    }
+}
+
 Matrix* transpose(const Matrix* M) {
     Matrix* N = create_matrix(M->cols, M->rows);
 

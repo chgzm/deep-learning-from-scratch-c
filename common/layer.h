@@ -41,7 +41,7 @@ Matrix* relu_forward(Relu* R, const Matrix* X);
 Matrix* relu_backward(Relu* R, const Matrix* D);
 
 SoftmaxWithLoss* create_softmax_with_loss();
-double softmax_with_loss_forward(SoftmaxWithLoss* sft, const Matrix* X, Vector* t);
+double softmax_with_loss_forward(SoftmaxWithLoss* sft, const Matrix* X, const Vector* t);
 Matrix* softmax_with_loss_backward(const SoftmaxWithLoss* sft);
 
 #endif

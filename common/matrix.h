@@ -49,6 +49,7 @@ Vector* add_vector(const Vector* a, const Vector* b);
 Vector* dot_vector_matrix(const Vector* v, const Matrix* M);
 Matrix* dot_matrix(const Matrix* M, const Matrix* N);
 Matrix* transpose(const Matrix* M);
+void scalar_matrix(Matrix* M, double k);
 
 //
 // create batch

@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-const static double LEARNING_RATE = 0.1;
+const static double LEARNING_RATE = 0.01;
 
 MultiLayerNet* create_multi_layer_net(
     int input_size, 
@@ -22,7 +22,6 @@ MultiLayerNet* create_multi_layer_net(
     net->R = malloc(sizeof(Relu*) * hidden_layer_num);
 
     net->W[0] = create_matrix(input_size, hidden_size);
-    init_matrix_random(net->W[0]);
     net->b[0] = create_vector(hidden_size);
     net->A[0] = create_affine(net->W[0], net->b[0]);
     net->R[0] = create_relu(batch_size, hidden_size);
@@ -38,6 +37,13 @@ MultiLayerNet* create_multi_layer_net(
 
     net->S = create_softmax_with_loss();
     net->hidden_layer_num = hidden_layer_num;
+
+    // init weight
+     for (int i = 0; i < hidden_layer_num + 1; ++i) {
+        const double scale = (i == 0) ? (sqrt(2.0 / input_size)) : (sqrt(2.0 / hidden_size));
+        init_matrix_random(net->W[i]);
+        scalar_matrix(net->W[i], scale);
+    }
 
     return net;
 }
@@ -66,7 +72,7 @@ static Matrix* predict(const MultiLayerNet* net, const Matrix* X) {
 
 static double loss(MultiLayerNet* net, const Matrix* X, const Vector* t) {
     Matrix* Y = predict(net, X);
-    const double v = softmax_with_loss_forward(net->S, Y, (Vector*)t); 
+    const double v = softmax_with_loss_forward(net->S, Y, t); 
 
     free(Y);
     return v;

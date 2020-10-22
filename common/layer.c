@@ -143,7 +143,7 @@ static double cross_entropy_error(const Matrix* Y, const Vector* t) {
     return -1.0 * sum / Y->rows;
 }
 
-double softmax_with_loss_forward(SoftmaxWithLoss* sft, const Matrix* X, Vector* t) {
+double softmax_with_loss_forward(SoftmaxWithLoss* sft, const Matrix* X, const Vector* t) {
     if (sft->t != NULL) {
         free_vector(sft->t);
     }

@@ -8,8 +8,8 @@
 #include "multi_layer_net.h"
 #include "optimizer.h"
 
-#define ITERS_NUM  10000
-#define BATCH_SIZE 100
+#define ITERS_NUM  2000
+#define BATCH_SIZE 128
 
 int main() {
     double** train_images = load_mnist_images("./../dataset/train-images-idx3-ubyte");
@@ -39,7 +39,7 @@ int main() {
     const int iter_per_epoch = NUM_OF_TRAIN_IMAGES / BATCH_SIZE;
 
     srand(time(NULL));
-    MultiLayerNet* net = create_multi_layer_net(784, 1, 100, 10, BATCH_SIZE);
+    MultiLayerNet* net = create_multi_layer_net(784, 4, 100, 10, BATCH_SIZE);
     for (int i = 0; i < ITERS_NUM; ++i) {
         int* batch_index = choice(NUM_OF_TRAIN_IMAGES, BATCH_SIZE);
         Matrix* x_batch  = create_image_batch(train_images, batch_index, BATCH_SIZE);
