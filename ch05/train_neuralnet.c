@@ -44,11 +44,11 @@ int main() {
         Matrix* x_batch  = create_image_batch(train_images, batch_index, BATCH_SIZE);
         Vector* t_batch  = create_label_batch(train_labels, batch_index, BATCH_SIZE);
 
-        gradient(net, x_batch, t_batch);
+        two_layer_net_gradient(net, x_batch, t_batch);
 
         if (i % iter_per_epoch == 0) {
-            const double train_acc = accuracy_two_layer_net(net, train_images, train_labels, NUM_OF_TRAIN_IMAGES);
-            const double test_acc  = accuracy_two_layer_net(net, test_images,  test_labels,  NUM_OF_TEST_IMAGES);
+            const double train_acc = two_layer_net_accuracy(net, train_images, train_labels, NUM_OF_TRAIN_IMAGES);
+            const double test_acc  = two_layer_net_accuracy(net, test_images,  test_labels,  NUM_OF_TEST_IMAGES);
             printf("train acc, test acc | %lf, %lf\n", train_acc, test_acc);
         }
 

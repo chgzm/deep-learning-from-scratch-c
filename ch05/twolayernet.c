@@ -57,7 +57,7 @@ static void update_vector(Vector* v, const Vector* dv) {
     }
 }
 
-void gradient(TwoLayerNet* net, const Matrix* X, const Vector* t) {
+void two_layer_net_gradient(TwoLayerNet* net, const Matrix* X, const Vector* t) {
     loss(net, X, t);
 
     Matrix* X1 = softmax_with_loss_backward(net->S);
@@ -88,7 +88,7 @@ static int _argmax(const double* v, int size) {
     return index;
 }
 
-double accuracy_two_layer_net(const TwoLayerNet* net, double** images, uint8_t* labels, int size) {
+double two_layer_net_accuracy(const TwoLayerNet* net, double** images, uint8_t* labels, int size) {
     Matrix* X = create_matrix(size, NUM_OF_PIXELS);
     for (int i = 0; i < size; ++i) {
         for (int j = 0; j < NUM_OF_PIXELS; ++j) {

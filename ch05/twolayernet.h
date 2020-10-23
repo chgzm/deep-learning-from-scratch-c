@@ -19,8 +19,8 @@ struct TwoLayerNet {
 };
 
 TwoLayerNet* create_two_layer_net(int input_size, int hidden_size, int output_size, int batch_size);
-void gradient(TwoLayerNet* net, const Matrix* X, const Vector* t);
+void two_layer_net_gradient(TwoLayerNet* net, const Matrix* X, const Vector* t);
 
-double accuracy_two_layer_net(const TwoLayerNet* net, double** images, uint8_t* labels, int size);
+double two_layer_net_accuracy(const TwoLayerNet* net, double** images, uint8_t* labels, int size);
 
 #endif
