@@ -13,7 +13,9 @@ TwoLayerNet* create_two_layer_net(int input_size, int hidden_size, int output_si
     net->b2 = create_vector(output_size);
 
     init_matrix_random(net->W1);
+    scalar_matrix(net->W1, 0.01);
     init_matrix_random(net->W2);
+    scalar_matrix(net->W2, 0.01);
 
     net->A1 = create_affine(net->W1, net->b1);
     net->R  = create_relu(batch_size, hidden_size);

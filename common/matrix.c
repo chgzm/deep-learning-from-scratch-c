@@ -103,7 +103,7 @@ static double rand_normal() {
 void init_matrix_random(Matrix* M) {
     for (int i = 0; i < M->rows; ++i) {
         for (int j = 0; j < M->cols; ++j) {
-            M->elements[i][j] = rand_normal() * 0.01;
+            M->elements[i][j] = rand_normal();
         }
     }
 }
