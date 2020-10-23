@@ -22,8 +22,8 @@ MultiLayerNet* create_multi_layer_net(
     int batch_size
 );
 
-void gradient(MultiLayerNet* net, const Matrix* X, const Vector* t);
+void multi_layer_net_gradient(MultiLayerNet* net, const Matrix* X, const Vector* t);
 
-double accuracy_multi_layer_net(const MultiLayerNet* net, double** images, uint8_t* labels, int size);
+double multi_layer_net_accuracy(const MultiLayerNet* net, double** images, uint8_t* labels, int size);
 
 #endif

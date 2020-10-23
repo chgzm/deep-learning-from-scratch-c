@@ -92,7 +92,7 @@ static void update_vector(Vector* v, const Vector* dv) {
     }
 }
 
-void gradient(MultiLayerNet* net, const Matrix* X, const Vector* t) {
+void multi_layer_net_gradient(MultiLayerNet* net, const Matrix* X, const Vector* t) {
     loss(net, X, t);
 
     Matrix* X1 = softmax_with_loss_backward(net->S);
@@ -127,7 +127,7 @@ static int _argmax(const double* v, int size) {
     return index;
 }
 
-double accuracy_multi_layer_net(const MultiLayerNet* net, double** images, uint8_t* labels, int size) {
+double multi_layer_net_accuracy(const MultiLayerNet* net, double** images, uint8_t* labels, int size) {
     Matrix* X = create_matrix(size, NUM_OF_PIXELS);
     for (int i = 0; i < size; ++i) {
         for (int j = 0; j < NUM_OF_PIXELS; ++j) {

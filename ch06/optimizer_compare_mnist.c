@@ -36,8 +36,6 @@ int main() {
         return -1;
     }
 
-    const int iter_per_epoch = NUM_OF_TRAIN_IMAGES / BATCH_SIZE;
-
     srand(time(NULL));
     MultiLayerNet* net = create_multi_layer_net(784, 4, 100, 10, BATCH_SIZE);
     for (int i = 0; i < ITERS_NUM; ++i) {
@@ -45,11 +43,11 @@ int main() {
         Matrix* x_batch  = create_image_batch(train_images, batch_index, BATCH_SIZE);
         Vector* t_batch  = create_label_batch(train_labels, batch_index, BATCH_SIZE);
 
-        gradient(net, x_batch, t_batch);
+        multi_layer_net_gradient(net, x_batch, t_batch);
 
-        if (i % iter_per_epoch == 0) {
-            const double train_acc = accuracy_multi_layer_net(net, train_images, train_labels, NUM_OF_TRAIN_IMAGES);
-            const double test_acc  = accuracy_multi_layer_net(net, test_images,  test_labels,  NUM_OF_TEST_IMAGES);
+        if (i % 100 == 0) {
+            const double train_acc = multi_layer_net_accuracy(net, train_images, train_labels, NUM_OF_TRAIN_IMAGES);
+            const double test_acc  = multi_layer_net_accuracy(net, test_images,  test_labels,  NUM_OF_TEST_IMAGES);
             printf("train acc, test acc | %lf, %lf\n", train_acc, test_acc);
         }
 
