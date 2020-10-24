@@ -11,6 +11,8 @@ struct MultiLayerNet {
     Affine**         A;
     Relu**           R;
     SoftmaxWithLoss* S;
+    int input_size;
+    int hidden_size;
     int hidden_layer_num;
 };
 
@@ -23,7 +25,7 @@ MultiLayerNet* create_multi_layer_net(
 );
 
 void multi_layer_net_gradient(MultiLayerNet* net, const Matrix* X, const Vector* t);
-
+double multi_layer_net_loss(MultiLayerNet* net, const Matrix* X, const Vector* t);
 double multi_layer_net_accuracy(const MultiLayerNet* net, double** images, uint8_t* labels, int size);
 
 #endif

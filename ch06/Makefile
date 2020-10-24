@@ -2,6 +2,7 @@ CFLAGS=-Wall -O3
 INCLUDE := -I./../common/
 SRCS=$(wildcard ./../common/*.c)
 OBJS=$(SRCS:.c=.o)
+CC=gcc
 
 all: optimizer_compare_naive optimizer_compare_mnist
 

@@ -5,8 +5,6 @@
 #include <stdlib.h>
 #include <math.h>
 
-const static double LEARNING_RATE = 0.01;
-
 MultiLayerNet* create_multi_layer_net(
     int input_size, 
     int hidden_layer_num, 
@@ -36,6 +34,8 @@ MultiLayerNet* create_multi_layer_net(
     }
 
     net->S = create_softmax_with_loss();
+    net->input_size = input_size;
+    net->hidden_size = hidden_size;
     net->hidden_layer_num = hidden_layer_num;
 
     // init weight
@@ -70,7 +70,7 @@ static Matrix* predict(const MultiLayerNet* net, const Matrix* X) {
     return NULL;
 }
 
-static double loss(MultiLayerNet* net, const Matrix* X, const Vector* t) {
+double multi_layer_net_loss(MultiLayerNet* net, const Matrix* X, const Vector* t) {
     Matrix* Y = predict(net, X);
     const double v = softmax_with_loss_forward(net->S, Y, t); 
 
@@ -78,22 +78,8 @@ static double loss(MultiLayerNet* net, const Matrix* X, const Vector* t) {
     return v;
 }
 
-static void update_matrix(Matrix* A, const Matrix* dA) {
-    for (int i = 0; i < A->rows; ++i) {
-        for (int j = 0; j < A->cols; ++j) {
-            A->elements[i][j] -= (dA->elements[i][j] * LEARNING_RATE);
-        }
-    }
-}
-
-static void update_vector(Vector* v, const Vector* dv) {
-    for (int i = 0; i < v->size; ++i) {
-        v->elements[i] -= (dv->elements[i] * LEARNING_RATE);
-    }
-}
-
 void multi_layer_net_gradient(MultiLayerNet* net, const Matrix* X, const Vector* t) {
-    loss(net, X, t);
+    multi_layer_net_loss(net, X, t);
 
     Matrix* X1 = softmax_with_loss_backward(net->S);
     Matrix* X2 = affine_backward(net->A[net->hidden_layer_num], X1);  
@@ -106,12 +92,8 @@ void multi_layer_net_gradient(MultiLayerNet* net, const Matrix* X, const Vector*
         X2 = affine_backward(net->A[i], X3);  
         free_matrix(X3);
     }
-    free_matrix(X2);
 
-    for (int i = 0; i < net->hidden_layer_num + 1; ++i) {
-        update_matrix(net->W[i], net->A[i]->dW);
-        update_vector(net->b[i], net->A[i]->db);
-    }
+    free_matrix(X2);
 }
 
 static int _argmax(const double* v, int size) {
