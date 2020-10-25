@@ -10,7 +10,8 @@ MultiLayerNet* create_multi_layer_net(
     int hidden_layer_num, 
     int hidden_size,
     int output_size,
-    int batch_size
+    int batch_size,
+    int weight_type
 ) {
     MultiLayerNet* net = malloc(sizeof(MultiLayerNet));
 
@@ -39,10 +40,33 @@ MultiLayerNet* create_multi_layer_net(
     net->hidden_layer_num = hidden_layer_num;
 
     // init weight
-     for (int i = 0; i < hidden_layer_num + 1; ++i) {
-        const double scale = (i == 0) ? (sqrt(2.0 / input_size)) : (sqrt(2.0 / hidden_size));
-        init_matrix_random(net->W[i]);
-        scalar_matrix(net->W[i], scale);
+    switch (weight_type) {
+    case He: {
+        for (int i = 0; i < hidden_layer_num + 1; ++i) {
+            const double scale = (i == 0) ? (sqrt(2.0 / input_size)) : (sqrt(2.0 / hidden_size));
+            init_matrix_random(net->W[i]);
+            scalar_matrix(net->W[i], scale);
+        }
+        break;
+    }
+    case Xavier: {
+        for (int i = 0; i < hidden_layer_num + 1; ++i) {
+            const double scale = (i == 0) ? (sqrt(1.0 / input_size)) : (sqrt(1.0 / hidden_size));
+            init_matrix_random(net->W[i]);
+            scalar_matrix(net->W[i], scale);
+        }
+        break;
+    }
+    case STD: {
+        for (int i = 0; i < hidden_layer_num + 1; ++i) {
+            init_matrix_random(net->W[i]);
+            scalar_matrix(net->W[i], 0.01);
+        }
+        break;
+    }
+    default: {
+        break;
+    }
     }
 
     return net;

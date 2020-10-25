@@ -21,8 +21,15 @@ MultiLayerNet* create_multi_layer_net(
     int hidden_layer_num, 
     int hidden_size, 
     int output_size,
-    int batch_size
+    int batch_size,
+    int weight_type
 );
+
+enum WEIGHT_TYPE {
+    STD,
+    Xavier,
+    He, 
+};
 
 void multi_layer_net_gradient(MultiLayerNet* net, const Matrix* X, const Vector* t);
 double multi_layer_net_loss(MultiLayerNet* net, const Matrix* X, const Vector* t);

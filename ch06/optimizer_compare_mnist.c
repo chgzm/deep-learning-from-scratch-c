@@ -201,7 +201,7 @@ static void Adam_process(MultiLayerNet* net, double** train_images, uint8_t* tra
 }
 
 static void process(int optimizer, double** train_images, uint8_t* train_labels, double** test_images, uint8_t* test_labels) {
-    MultiLayerNet* net = create_multi_layer_net(784, 4, 100, 10, BATCH_SIZE);
+    MultiLayerNet* net = create_multi_layer_net(784, 4, 100, 10, BATCH_SIZE, He);
     switch (optimizer) {
     case SGD: { 
         SGD_process(net, train_images, train_labels, test_images, test_labels);
