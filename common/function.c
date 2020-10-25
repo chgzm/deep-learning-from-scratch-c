@@ -15,6 +15,18 @@ Vector* vector_sigmoid(const Vector* v) {
     return r;
 }
 
+Matrix* matrix_sigmoid(const Matrix* M) {
+    Matrix* R = create_matrix(M->rows, M->cols);
+    
+    for (int i = 0; i < M->rows; ++i) {
+        for (int j = 0; j < M->cols; ++j) {
+            R->elements[i][j] = sigmoid(M->elements[i][j]);
+        }
+    }
+
+    return R;
+}
+
 Matrix* sigmoid_grad(const Matrix* M) {
     Matrix* R = create_matrix(M->rows, M->cols);
     
