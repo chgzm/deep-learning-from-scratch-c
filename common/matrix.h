@@ -47,9 +47,19 @@ void free_matrix(Matrix* M);
 
 Vector* add_vector(const Vector* a, const Vector* b);
 Vector* dot_vector_matrix(const Vector* v, const Matrix* M);
+Matrix* add_matrix(const Matrix* M, const Matrix* N);
 Matrix* dot_matrix(const Matrix* M, const Matrix* N);
+Matrix* product_vector_matrix_element(const Vector* V, const Matrix* M);
 Matrix* transpose(const Matrix* M);
+Vector* matrix_col_mean(const Matrix* M);
+Matrix* matrix_add_vector(const Matrix* M, const Vector* V);
+Matrix* matrix_sub_vector(const Matrix* M, const Vector* V);
+Matrix* matrix_div_vector(const Matrix* M, const Vector* V);
+Vector* vector_add_scalar(const Vector* M, double v);
+Matrix* pow_matrix(Matrix* M, double k);
+Vector* sqrt_vector(Vector* M);
 void scalar_matrix(Matrix* M, double k);
+void scalar_vector(Vector* V, double k);
 
 //
 // create batch

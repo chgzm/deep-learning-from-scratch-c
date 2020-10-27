@@ -10,7 +10,6 @@
 //
 // factory
 //
-
 Vector* create_vector(int size) {
     Vector* v = calloc(1, sizeof(Vector));
     v->size = size;
@@ -185,6 +184,20 @@ Matrix* dot_matrix(const Matrix* M, const Matrix* N) {
     }
 
     return A;
+}
+
+Vector* matrix_col_mean(const Matrix* M) {
+    Vector* V = create_vector(M->cols);
+
+    for (int i = 0; i < M->cols; ++i) {
+        double sum = 0.0;
+        for (int j = 0; j < M->rows; ++j) {
+            sum += M->elements[j][i];
+        }
+        V->elements[i] = sum / M->rows; 
+    }
+
+    return V;
 }
 
 void scalar_matrix(Matrix* M, double k) {

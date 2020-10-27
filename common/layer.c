@@ -172,3 +172,68 @@ Matrix* softmax_with_loss_backward(const SoftmaxWithLoss* sft) {
 
     return dX;
 }
+#if 0
+BatchNormalization* create_batch_normalization(Vector* g, Vector* b) {
+    BatchNormalization* B = malloc(sizeof(BatchNormalization));
+    B->g  = g;
+    B->b  = b;
+    return B;
+}
+
+Matrix* batch_normalization_forward(BatchNormalization* B, const Matrix* X) {
+    if (B->xc != NULL) {
+        free_matrix(B->xc);
+        free_matrix(B->xn);
+        free_vector(B->std);
+        free_vector(B->running_mean);
+        free_vector(B->running_var);
+    }
+
+    Vector* mu = matrix_col_mean(X);
+    B->xc = matrix_sub_vector(X, mu); // 各列同じ値を引く
+    Matrix* xc_tmp = pow_matrix(B->xc, 2);
+    Vector* var = matrix_col_mean(xc_tmp);
+    Vector* var_tmp = vector_add_scalar(var, 10e-7);
+    B->std = sqrt_vector(var_tmp);
+    B->xn = matrix_div_vector(B->xc, B->std); // 各列同じ値で割る？
+
+    Vector* prev_running_mean = B->running_mean;
+    Vector* prev_running_var = B->running_var;
+
+    scalar_vector(prev_running_mean, B->momentum);
+    scalar_vector(mu, 1.0 - B->momentum);
+    B->running_mean = add_vector(prev_running_var, mu);
+
+    scalar_vector(prev_running_var, B->momentum);
+    scalar_vector(var, 1.0 - B->momentum);
+    B->running_var = add_vector(prev_running_var, var);
+   
+    Matrix* l = product_vector_matrix_element(B->g, B->xn);
+    Matrix* out = matrix_add_vector(l, B->b); // 各列同じ値を足す？
+
+    free_vector(mu);
+    free_vector(var);
+    free_vector(var_tmp);
+    free_vector(prev_running_mean);
+    free_vector(prev_running_var);
+    free_matrix(xc_tmp);
+    free_matrix(l);
+
+    return out;
+}
+
+Matrix* batch_normalization_backward(BatchNormalization* B, const Matrix* D) {
+    Vector* dbeta = matrix_col_sum(D);
+
+    Matrix* tmp = product_matrix_element(B->xn, D);
+    Vector* dgamma = matrix_col_sum(tmp);
+    Matrix* dxn = product_vector_matrix_element(B->g, D);
+    Matrix* dxc = matrix_div_vector(dxn, B->std);
+    
+    Matrix* tmp2 = product_matrix_element(dxn, B->xc);
+
+
+
+    return NULL;
+}
+#endif
