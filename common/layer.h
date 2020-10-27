@@ -49,6 +49,7 @@ struct BatchNormalization {
     double momentum;
     int batch_size;
 };
+#endif
 
 Affine* create_affine(Matrix* W, Vector* b);
 Matrix* affine_forward(Affine* A, const Matrix* X);
@@ -62,6 +63,7 @@ SoftmaxWithLoss* create_softmax_with_loss();
 double softmax_with_loss_forward(SoftmaxWithLoss* sft, const Matrix* X, const Vector* t);
 Matrix* softmax_with_loss_backward(const SoftmaxWithLoss* sft);
 
+#if 0
 BatchNormalization* create_batch_normalization(Vector* g, Vector* b);
 Matrix* batch_normalization_forward(BatchNormalization* B, const Matrix* X);
 Matrix* batch_normalization_backward(BatchNormalization* B, const Matrix* D);
