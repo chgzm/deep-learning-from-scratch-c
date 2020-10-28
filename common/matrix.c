@@ -186,6 +186,39 @@ Matrix* dot_matrix(const Matrix* M, const Matrix* N) {
     return A;
 }
 
+Matrix* product_vector_matrix(const Vector* V, const Matrix* M) {
+    Matrix* A = create_matrix(M->rows, M->cols);
+
+    for (int i = 0; i < M->cols; ++i) {
+        for (int j = 0; j < M->rows; ++j) {
+            A->elements[j][i] = M->elements[j][i] * V->elements[i];
+        }
+    }
+
+    return A;
+}
+
+Matrix* product_matrix(const Matrix* M, const Matrix* N) {
+    Matrix* A = create_matrix(M->rows, M->cols);
+
+     for (int i = 0; i < M->rows; ++i) {
+        for (int j = 0; j < M->cols; ++j) {
+            A->elements[i][j] = M->elements[i][j] * N->elements[i][j];
+        }
+    }
+   
+    return A;
+}
+
+Vector* product_vector(const Vector* V, const Vector* U) {
+    Vector* R = create_vector(V->size);
+    for (int i = 0; i < V->size; ++i) {
+        R->elements[i] = V->elements[i] * U->elements[i];
+    }
+
+    return R;
+}
+
 Vector* matrix_col_mean(const Matrix* M) {
     Vector* V = create_vector(M->cols);
 
@@ -214,6 +247,73 @@ Matrix* transpose(const Matrix* M) {
     for (int i = 0; i < N->rows; ++i) {
         for (int j = 0; j < N->cols; ++j) {
             N->elements[i][j] = M->elements[j][i];
+        }
+    }
+
+    return N;
+}
+
+Vector* matrix_col_sum(const Matrix* M) {
+    Vector* v = create_vector(M->cols);
+
+    for (int i = 0; i < M->cols; ++i) {
+        double sum = 0.0;
+        for (int j = 0; j < M->rows; ++j) {
+            sum += M->elements[j][i];
+        }
+        v->elements[i] = sum;
+    }
+
+    return v;
+}
+
+Vector* vector_div_vector(const Vector* V, const Vector* U) {
+    Vector* r = create_vector(V->size);
+    for (int i = 0; i < V->size; ++i) {
+        r->elements[i] = V->elements[i] / U->elements[i];
+    }
+
+    return r;
+}
+
+Matrix* matrix_add_vector(const Matrix* M, const Vector* V) {
+    Matrix* N = create_matrix(M->rows, M->cols);
+    for (int i = 0; i < M->cols; ++i) {
+        for (int j = 0; j < M->rows; ++j) {
+            N->elements[j][i] = M->elements[j][i] + V->elements[i];
+        }
+    }
+
+    return N;
+}
+
+Matrix* matrix_add_matrix(const Matrix* M, const Matrix* N) {
+    Matrix* R = create_matrix(M->rows, M->cols);
+    for (int i = 0; i < M->cols; ++i) {
+        for (int j = 0; j < M->rows; ++j) {
+            R->elements[j][i] = M->elements[j][i] + N->elements[i][j];
+        }
+    }
+
+    return R;
+}
+
+Matrix* matrix_sub_vector(const Matrix* M, const Vector* V) {
+    Matrix* N = create_matrix(M->rows, M->cols);
+    for (int i = 0; i < M->cols; ++i) {
+        for (int j = 0; j < M->rows; ++j) {
+            N->elements[j][i] = M->elements[j][i] - V->elements[i];
+        }
+    }
+
+    return N;
+}
+
+Matrix* matrix_div_vector(const Matrix* M, const Vector* V) {
+    Matrix* N = create_matrix(M->rows, M->cols);
+    for (int i = 0; i < M->cols; ++i) {
+        for (int j = 0; j < M->rows; ++j) {
+            N->elements[j][i] = M->elements[j][i] / V->elements[i];
         }
     }
 

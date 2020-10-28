@@ -49,10 +49,16 @@ Vector* add_vector(const Vector* a, const Vector* b);
 Vector* dot_vector_matrix(const Vector* v, const Matrix* M);
 Matrix* add_matrix(const Matrix* M, const Matrix* N);
 Matrix* dot_matrix(const Matrix* M, const Matrix* N);
-Matrix* product_vector_matrix_element(const Vector* V, const Matrix* M);
+Matrix* product_vector_matrix(const Vector* V, const Matrix* M);
+Matrix* product_matrix(const Matrix* M, const Matrix* N);
+Vector* product_vector(const Vector* V, const Vector* U);
 Matrix* transpose(const Matrix* M);
+
 Vector* matrix_col_mean(const Matrix* M);
+Vector* matrix_col_sum(const Matrix* M);
+Vector* vector_div_vector(const Vector* V, const Vector* U);
 Matrix* matrix_add_vector(const Matrix* M, const Vector* V);
+Matrix* matrix_add_matrix(const Matrix* M, const Matrix* N);
 Matrix* matrix_sub_vector(const Matrix* M, const Vector* V);
 Matrix* matrix_div_vector(const Matrix* M, const Vector* V);
 Vector* vector_add_scalar(const Vector* M, double v);

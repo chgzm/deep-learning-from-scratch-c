@@ -172,11 +172,21 @@ Matrix* softmax_with_loss_backward(const SoftmaxWithLoss* sft) {
 
     return dX;
 }
-#if 0
-BatchNormalization* create_batch_normalization(Vector* g, Vector* b) {
+
+BatchNormalization* create_batch_normalization(Vector* g, Vector* b, double momentum) {
     BatchNormalization* B = malloc(sizeof(BatchNormalization));
     B->g  = g;
     B->b  = b;
+
+    B->dg  = NULL;
+    B->db  = NULL;
+    B->xc  = NULL;
+    B->xn  = NULL;
+    B->std = NULL;
+    B->running_mean = NULL;
+    B->running_var  = NULL;
+    B->momentum = momentum;
+
     return B;
 }
 
@@ -188,14 +198,15 @@ Matrix* batch_normalization_forward(BatchNormalization* B, const Matrix* X) {
         free_vector(B->running_mean);
         free_vector(B->running_var);
     }
+    B->batch_size = X->rows;
 
     Vector* mu = matrix_col_mean(X);
-    B->xc = matrix_sub_vector(X, mu); // 各列同じ値を引く
+    B->xc = matrix_sub_vector(X, mu); 
     Matrix* xc_tmp = pow_matrix(B->xc, 2);
     Vector* var = matrix_col_mean(xc_tmp);
     Vector* var_tmp = vector_add_scalar(var, 10e-7);
     B->std = sqrt_vector(var_tmp);
-    B->xn = matrix_div_vector(B->xc, B->std); // 各列同じ値で割る？
+    B->xn = matrix_div_vector(B->xc, B->std);
 
     Vector* prev_running_mean = B->running_mean;
     Vector* prev_running_var = B->running_var;
@@ -208,8 +219,8 @@ Matrix* batch_normalization_forward(BatchNormalization* B, const Matrix* X) {
     scalar_vector(var, 1.0 - B->momentum);
     B->running_var = add_vector(prev_running_var, var);
    
-    Matrix* l = product_vector_matrix_element(B->g, B->xn);
-    Matrix* out = matrix_add_vector(l, B->b); // 各列同じ値を足す？
+    Matrix* l = product_vector_matrix(B->g, B->xn);
+    Matrix* out = matrix_add_vector(l, B->b);
 
     free_vector(mu);
     free_vector(var);
@@ -223,17 +234,63 @@ Matrix* batch_normalization_forward(BatchNormalization* B, const Matrix* X) {
 }
 
 Matrix* batch_normalization_backward(BatchNormalization* B, const Matrix* D) {
+    // dbeta
     Vector* dbeta = matrix_col_sum(D);
 
-    Matrix* tmp = product_matrix_element(B->xn, D);
+    // dgamma  
+    Matrix* tmp = product_matrix(B->xn, D);
     Vector* dgamma = matrix_col_sum(tmp);
-    Matrix* dxn = product_vector_matrix_element(B->g, D);
+
+    // dxn
+    Matrix* dxn = product_vector_matrix(B->g, D);
+
+    // dxc
     Matrix* dxc = matrix_div_vector(dxn, B->std);
     
-    Matrix* tmp2 = product_matrix_element(dxn, B->xc);
+    // dstd 
+    Matrix* tmp2 = product_matrix(dxn, B->xc);
+    Vector* tmp3 = product_vector(B->std, B->std);
+    Matrix* tmp4 = matrix_div_vector(tmp2, tmp3);
+    Vector* dstd = matrix_col_sum(tmp4);
+    scalar_vector(dstd, -1);
 
+    // dvar
+    Vector* tmp5 = create_vector(dstd->size);
+    copy_vector(tmp5, dstd);
+    scalar_vector(tmp5, 0.5);
+    Vector* dvar = vector_div_vector(tmp5, B->std);
+    
+    // dxc
+    Matrix* tmp6 = create_matrix(B->xc->rows, B->xc->cols);
+    copy_matrix(tmp6, B->xc);
+    scalar_matrix(tmp6, 2.0 / B->batch_size);
+    Matrix* tmp7 = product_vector_matrix(dvar, tmp6);
+    Matrix* _dxc = matrix_add_matrix(dxc, tmp7);
 
+    // dmu
+    Vector* dmu = matrix_col_sum(_dxc); 
 
-    return NULL;
+    // dx
+    Matrix* dx = matrix_sub_vector(_dxc, dmu);
+    scalar_matrix(dx, 1.0 / B->batch_size);
+
+    B->dg = dgamma;
+    B->db = dbeta;
+
+    free_vector(tmp3);
+    free_vector(dstd);
+    free_vector(tmp5);
+    free_vector(dvar);
+    free_vector(dmu); 
+
+    free_matrix(tmp);
+    free_matrix(dxn);
+    free_matrix(dxc);
+    free_matrix(tmp2);
+    free_matrix(tmp4);
+    free_matrix(tmp6);
+    free_matrix(tmp7);
+    free_matrix(_dxc);
+
+    return dx;
 }
-#endif
