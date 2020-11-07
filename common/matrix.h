@@ -21,6 +21,7 @@ struct Matrix {
 //
 
 Vector* create_vector(int size);
+Vector* create_vector_initval(int size, double init_val);
 Matrix* create_matrix(int rows, int cols);
 
 //
@@ -63,7 +64,7 @@ Matrix* matrix_sub_vector(const Matrix* M, const Vector* V);
 Matrix* matrix_div_vector(const Matrix* M, const Vector* V);
 Vector* vector_add_scalar(const Vector* M, double v);
 Matrix* pow_matrix(Matrix* M, double k);
-Vector* sqrt_vector(Vector* M);
+Vector* sqrt_vector(const Vector* V);
 void scalar_matrix(Matrix* M, double k);
 void scalar_vector(Vector* V, double k);
 

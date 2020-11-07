@@ -4,7 +4,7 @@ SRCS=$(wildcard ./../common/*.c)
 OBJS=$(SRCS:.c=.o)
 CC=gcc
 
-all: optimizer_compare_naive optimizer_compare_mnist weight_init_activation_histogram weight_init_compare
+all: optimizer_compare_naive optimizer_compare_mnist weight_init_activation_histogram weight_init_compare batch_norm_test
 
 #optimizer_compare_naive.o: optimizer_compare_naive.c
 #	gcc -c optimizer_compare_naive.c $(INCLUDE) $(CFLAGS) -lm
@@ -20,6 +20,10 @@ weight_init_activation_histogram: $(OBJS) weight_init_activation_histogram.c
 
 weight_init_compare: $(OBJS) weight_init_compare.c
 	$(CC) weight_init_compare.c $(INCLUDE) -o $@ $(OBJS) $(CFLAGS) -lm
+
+batch_norm_test: $(OBJS) batch_norm_test.c
+	$(CC) batch_norm_test.c $(INCLUDE) -o $@ $(OBJS) $(CFLAGS) -lm
+
 
 clean:
 	rm -f optimizer_compare_naive optimizer_compare_mnist weight_init_activation_histogram weight_init_compare naive_*.txt ./../common/*.o ./*.o

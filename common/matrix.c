@@ -17,6 +17,18 @@ Vector* create_vector(int size) {
     return v;
 }
 
+Vector* create_vector_initval(int size, double init_val) {
+    Vector* v = calloc(1, sizeof(Vector));
+    v->size = size;
+    v->elements = calloc(size, sizeof(double));
+
+    for (int i = 0; i < size; ++i) {
+        v->elements[i] = init_val;
+    }
+
+    return v;
+}
+
 Matrix* create_matrix(int rows, int cols) {
     Matrix* M = malloc(sizeof(Matrix));
     M->rows = rows;
@@ -241,6 +253,12 @@ void scalar_matrix(Matrix* M, double k) {
     }
 }
 
+void scalar_vector(Vector* V, double k) {
+    for (int i = 0; i < V->size; ++i) {
+        V->elements[i] *= k;
+    }
+}
+
 Matrix* transpose(const Matrix* M) {
     Matrix* N = create_matrix(M->cols, M->rows);
 
@@ -320,6 +338,34 @@ Matrix* matrix_div_vector(const Matrix* M, const Vector* V) {
     return N;
 }
 
+Vector* vector_add_scalar(const Vector* V, double val) {
+    Vector* r = create_vector(V->size);
+    for (int i = 0; i < V->size; ++i) {
+        r->elements[i] = V->elements[i] + val;
+    }
+
+    return r;
+}
+
+Matrix* pow_matrix(Matrix* M, double k) {
+    Matrix* N = create_matrix(M->rows, M->cols);
+    for (int i = 0; i < M->rows; ++i) {
+        for (int j = 0; j < M->cols; ++j) {
+            N->elements[i][j] = pow(M->elements[i][j], k);
+        }
+    }
+
+    return N;
+}
+
+Vector* sqrt_vector(const Vector* V) {
+    Vector* r = create_vector(V->size);
+    for (int i = 0; i < V->size; ++i) {
+        r->elements[i] = sqrt(V->elements[i]);
+    }
+    return r;
+}
+
 //
 // create batch
 //
@@ -349,7 +395,7 @@ Vector* create_label_batch(uint8_t* labels, const int* batch_index, int size) {
 //
 
 void print_vector(const Vector* v) {
-    printf("[");
+    printf("size=%d, [", v->size);
     for (int i = 0; i < v->size; ++i) {
         printf("%lf ", v->elements[i]);
     }
@@ -357,7 +403,7 @@ void print_vector(const Vector* v) {
 }
 
 void print_matrix(const Matrix* M) {
-    printf("[");
+    printf("rows=%d,cols=%d,[", M->rows, M->cols);
     for (int i = 0; i < M->rows; ++i) {
         printf("[");
         for (int j = 0; j < M->cols; ++j) {
