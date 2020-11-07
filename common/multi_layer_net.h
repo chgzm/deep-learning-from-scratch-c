@@ -22,7 +22,8 @@ MultiLayerNet* create_multi_layer_net(
     int hidden_size, 
     int output_size,
     int batch_size,
-    int weight_type
+    int weight_type,
+    double weight
 );
 
 enum WEIGHT_TYPE {
