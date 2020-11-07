@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <math.h>
 #include <byteswap.h>
 
 uint8_t* read_file(const char* file_path) {
@@ -61,6 +62,19 @@ int* choice(int size, int num) {
 
     int* ret = malloc(sizeof(int) * num); 
     memcpy(ret, vals, sizeof(int) * num);
+
+    return ret;
+}
+
+double* logspace(double start, double stop, int num) {
+    double* ret = malloc(sizeof(double) * num);
+
+    double cur = start;
+    double delta = (stop - start) / (num - 1);
+    for (int i = 0; i < num; ++i) {
+        ret[i] = pow(10, cur);
+        cur += delta;
+    }
 
     return ret;
 }
