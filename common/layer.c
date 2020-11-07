@@ -195,30 +195,45 @@ Matrix* batch_normalization_forward(BatchNormalization* B, const Matrix* X) {
         free_matrix(B->xc);
         free_matrix(B->xn);
         free_vector(B->std);
-        free_vector(B->running_mean);
-        free_vector(B->running_var);
+    }
+
+    if (B->running_mean == NULL) {
+        B->running_mean = create_vector(B->g->size);
+        B->running_var  = create_vector(B->g->size);
     }
     B->batch_size = X->rows;
 
+    // mu
     Vector* mu = matrix_col_mean(X);
+
+    // xc
     B->xc = matrix_sub_vector(X, mu); 
+
+    // var 
     Matrix* xc_tmp = pow_matrix(B->xc, 2);
     Vector* var = matrix_col_mean(xc_tmp);
+
+    // std 
     Vector* var_tmp = vector_add_scalar(var, 10e-7);
     B->std = sqrt_vector(var_tmp);
+
+    // xn 
     B->xn = matrix_div_vector(B->xc, B->std);
 
     Vector* prev_running_mean = B->running_mean;
     Vector* prev_running_var = B->running_var;
-
+ 
+    // running_mean
     scalar_vector(prev_running_mean, B->momentum);
     scalar_vector(mu, 1.0 - B->momentum);
-    B->running_mean = add_vector(prev_running_var, mu);
+    B->running_mean = add_vector(prev_running_mean, mu);
 
+    // running_var
     scalar_vector(prev_running_var, B->momentum);
     scalar_vector(var, 1.0 - B->momentum);
     B->running_var = add_vector(prev_running_var, var);
    
+    // out
     Matrix* l = product_vector_matrix(B->g, B->xn);
     Matrix* out = matrix_add_vector(l, B->b);
 
@@ -229,6 +244,8 @@ Matrix* batch_normalization_forward(BatchNormalization* B, const Matrix* X) {
     free_vector(prev_running_var);
     free_matrix(xc_tmp);
     free_matrix(l);
+
+    // print_matrix(out);
 
     return out;
 }
@@ -271,8 +288,8 @@ Matrix* batch_normalization_backward(BatchNormalization* B, const Matrix* D) {
     Vector* dmu = matrix_col_sum(_dxc); 
 
     // dx
+    scalar_vector(dmu, 1.0 / B->batch_size);
     Matrix* dx = matrix_sub_vector(_dxc, dmu);
-    scalar_matrix(dx, 1.0 / B->batch_size);
 
     B->dg = dgamma;
     B->db = dbeta;
