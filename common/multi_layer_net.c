@@ -2,6 +2,7 @@
 #include "function.h"
 #include "mnist.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 
@@ -27,10 +28,14 @@ MultiLayerNet* create_multi_layer_net(
     net->R[0] = create_relu(batch_size, hidden_size);
 
     for (int i = 1; i < hidden_layer_num + 1; ++i) {
-        net->W[i] = create_matrix(hidden_size, hidden_size);
-        net->b[i] = create_vector(hidden_size);
-        net->A[i] = create_affine(net->W[i], net->b[i]);
-        if (i != hidden_layer_num) {
+        if (i == hidden_layer_num) {
+            net->W[i] = create_matrix(hidden_size, output_size);
+            net->b[i] = create_vector(output_size);
+            net->A[i] = create_affine(net->W[i], net->b[i]);
+        } else {
+            net->W[i] = create_matrix(hidden_size, hidden_size);
+            net->b[i] = create_vector(hidden_size);
+            net->A[i] = create_affine(net->W[i], net->b[i]);
             net->R[i] = create_relu(batch_size, hidden_size);
         }
     }
@@ -153,5 +158,6 @@ double multi_layer_net_accuracy(const MultiLayerNet* net, double** images, uint8
 
     free_matrix(X);
     free_matrix(Y);
-    return (double)cnt / size;
+
+    return (double) cnt / size;
 }

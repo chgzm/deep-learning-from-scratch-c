@@ -37,11 +37,15 @@ MultiLayerNetExtend* create_multi_layer_net_extend(
     net->R[0] = create_relu(batch_size, hidden_size);
 
     for (int i = 1; i < hidden_layer_num + 1; ++i) {
-        net->W[i] = create_matrix(hidden_size, hidden_size);
-        net->b[i] = create_vector(hidden_size);
-        net->A[i] = create_affine(net->W[i], net->b[i]);
-
-        if (i != hidden_layer_num) {
+        if (i == hidden_layer_num) {
+            net->W[i] = create_matrix(hidden_size, output_size);
+            net->b[i] = create_vector(output_size);
+            net->A[i] = create_affine(net->W[i], net->b[i]);
+        } else {
+            net->W[i] = create_matrix(hidden_size, hidden_size);
+            net->b[i] = create_vector(hidden_size);
+            net->A[i] = create_affine(net->W[i], net->b[i]);
+            
             net->gamma[i] = create_vector_initval(hidden_size, 1);
             net->beta[i]  = create_vector(hidden_size);
             net->B[i]     = create_batch_normalization(net->gamma[i], net->beta[i], 0.9);
