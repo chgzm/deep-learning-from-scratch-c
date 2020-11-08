@@ -109,7 +109,7 @@ static double rand_normal() {
     double r1 = ((double)rand() + 0.5) / ((double)RAND_MAX + 1);
     double r2 = ((double)rand() + 0.5) / ((double)RAND_MAX + 1);
     return sqrt(-2.0 * log(r1)) * sin(2.0 * M_PI * r2);
- }
+}
 
 void init_matrix_random(Matrix* M) {
     for (int i = 0; i < M->rows; ++i) {
