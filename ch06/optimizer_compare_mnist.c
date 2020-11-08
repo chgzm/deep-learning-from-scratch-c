@@ -27,7 +27,7 @@ static void SGD_process(MultiLayerNet* net, double** train_images, uint8_t* trai
 
         multi_layer_net_gradient(net, x_batch, t_batch);
 
-        for (int j = 0; j < net->hidden_layer_num; ++j) {
+        for (int j = 0; j < net->hidden_layer_num + 1; ++j) {
             SGD_update_vector(net->b[j], net->A[j]->db, lr);
             SGD_update_matrix(net->W[j], net->A[j]->dW, lr);
         }
@@ -78,7 +78,7 @@ static void Momentum_process(MultiLayerNet* net, double** train_images, uint8_t*
 
         fprintf(fp, "%lf\n", multi_layer_net_loss(net, x_batch, t_batch));
 
-        for (int j = 0; j < net->hidden_layer_num; ++j) {
+        for (int j = 0; j < net->hidden_layer_num + 1; ++j) {
             Momentum_update_vector(net->b[j], net->A[j]->db, lr, momentum, v[j]);
             Momentum_update_matrix(net->W[j], net->A[j]->dW, lr, momentum, m[j]);
         }
@@ -126,7 +126,7 @@ static void AdaGrad_process(MultiLayerNet* net, double** train_images, uint8_t* 
 
         fprintf(fp, "%lf\n", multi_layer_net_loss(net, x_batch, t_batch));
 
-        for (int j = 0; j < net->hidden_layer_num; ++j) {
+        for (int j = 0; j < net->hidden_layer_num + 1; ++j) {
             AdaGrad_update_matrix(net->W[j], net->A[j]->dW, lr, m[j]);
             AdaGrad_update_vector(net->b[j], net->A[j]->db, lr, v[j]);
         }
@@ -181,7 +181,7 @@ static void Adam_process(MultiLayerNet* net, double** train_images, uint8_t* tra
         multi_layer_net_gradient(net, x_batch, t_batch);
         fprintf(fp, "%lf\n", multi_layer_net_loss(net, x_batch, t_batch));
 
-        for (int j = 0; j < net->hidden_layer_num; ++j) {
+        for (int j = 0; j < net->hidden_layer_num + 1; ++j) {
             Adam_update_matrix(net->W[j], net->A[j]->dW, lr, beta1, beta2, m[j], n[j], i);
             Adam_update_vector(net->b[j], net->A[j]->db, lr, beta1, beta2, v[j], u[j], i);
         }

@@ -37,7 +37,7 @@ static void process(int weight_init, double** train_images, uint8_t* train_label
 
         multi_layer_net_gradient(net, x_batch, t_batch);
 
-        for (int j = 0; j < net->hidden_layer_num; ++j) {
+        for (int j = 0; j < net->hidden_layer_num + 1; ++j) {
             SGD_update_vector(net->b[j], net->A[j]->db, lr);
             SGD_update_matrix(net->W[j], net->A[j]->dW, lr);
         }
