@@ -42,14 +42,17 @@ static void process(double** train_images, uint8_t* train_labels) {
             multi_layer_net_gradient(net, x_batch, t_batch);
             multi_layer_net_extend_gradient(net_bn, x_batch, t_batch);
 
-            for (int j = 0; j < net->hidden_layer_num; ++j) {
+            for (int j = 0; j < net->hidden_layer_num + 1; ++j) {
                 SGD_update_vector(net->b[j], net->A[j]->db, lr);
                 SGD_update_matrix(net->W[j], net->A[j]->dW, lr);
 
                 SGD_update_vector(net_bn->b[j], net_bn->A[j]->db, lr);
                 SGD_update_matrix(net_bn->W[j], net_bn->A[j]->dW, lr);
-                SGD_update_vector(net_bn->gamma[j], net_bn->B[j]->dg, lr);
-                SGD_update_vector(net_bn->beta[j],  net_bn->B[j]->db, lr);
+
+                if (j != net->hidden_layer_num) {
+                    SGD_update_vector(net_bn->gamma[j], net_bn->B[j]->dg, lr);
+                    SGD_update_vector(net_bn->beta[j],  net_bn->B[j]->db, lr);
+                }
             }
 
             if (i % 10 == 0) {
