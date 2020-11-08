@@ -12,10 +12,11 @@
 #include <optimizer.h>
 
 #define ITERS_NUM  2000
+#define TRAIN_SIZE 1000
 #define BATCH_SIZE 100
 #define MAX_EPOCHS 20
 
-static void process(double** train_images, uint8_t* train_labels, double** test_images, uint8_t* test_labels) {
+static void process(double** train_images, uint8_t* train_labels) {
     double* weight_scale_list = logspace(0, -4, 16);
 
     for (int i = 0; i < 16; ++i) {
@@ -33,7 +34,8 @@ static void process(double** train_images, uint8_t* train_labels, double** test_
 
         int epoch_cnt = 0;
         for (int i = 0; i < 1000000000; ++i) {
-            int* batch_index = choice(1000, BATCH_SIZE);
+            int* batch_index = choice(TRAIN_SIZE, BATCH_SIZE);
+
             Matrix* x_batch  = create_image_batch(train_images, batch_index, BATCH_SIZE);
             Vector* t_batch  = create_label_batch(train_labels, batch_index, BATCH_SIZE);
 
@@ -51,12 +53,11 @@ static void process(double** train_images, uint8_t* train_labels, double** test_
             }
 
             if (i % 10 == 0) {
-                const double train_acc = multi_layer_net_accuracy(net, train_images, train_labels, 1000);
-                const double train_acc_bn = multi_layer_net_extend_accuracy(net_bn, train_images, train_labels, 1000);
+                const double train_acc = multi_layer_net_accuracy(net, train_images, train_labels, TRAIN_SIZE);
+                const double train_acc_bn = multi_layer_net_extend_accuracy(net_bn, train_images, train_labels, TRAIN_SIZE);
                 printf("epoch:%d train acc, test acc | %lf, %lf\n", epoch_cnt, train_acc, train_acc_bn);
                 fprintf(fp, "%d %lf %lf\n", epoch_cnt, train_acc, train_acc_bn);
                 ++epoch_cnt;
-
            }
 
             free(batch_index);
@@ -85,20 +86,8 @@ int main() {
         return -1;
     }
 
-    double** test_images = load_mnist_images("./../dataset/t10k-images-idx3-ubyte");
-    if (test_images == NULL) {
-        fprintf(stderr, "failed to load test images.\n");
-        return -1;
-    }
-
-    uint8_t* test_labels = load_mnist_labels("./../dataset/t10k-labels-idx1-ubyte");
-    if (test_labels == NULL) {
-        fprintf(stderr, "failed to load test labels.\n");
-        return -1;
-    }
-
     srand(time(NULL));
-    process(train_images, train_labels, test_images, test_labels);
+    process(train_images, train_labels);
 
     return 0;   
 }
