@@ -59,7 +59,7 @@ Affine* create_affine(Matrix* W, Vector* b);
 Matrix* affine_forward(Affine* A, const Matrix* X);
 Matrix* affine_backward(Affine* A, const Matrix* D);
 
-Relu* create_relu(int rows, int cols);
+Relu* create_relu();
 Matrix* relu_forward(Relu* R, const Matrix* X);
 Matrix* relu_backward(Relu* R, const Matrix* D);
 

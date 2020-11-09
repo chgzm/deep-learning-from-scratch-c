@@ -18,7 +18,7 @@ TwoLayerNet* create_two_layer_net(int input_size, int hidden_size, int output_si
     scalar_matrix(net->W2, 0.01);
 
     net->A1 = create_affine(net->W1, net->b1);
-    net->R  = create_relu(batch_size, hidden_size);
+    net->R  = create_relu();
     net->A2 = create_affine(net->W2, net->b2);
     net->S  = create_softmax_with_loss();
 

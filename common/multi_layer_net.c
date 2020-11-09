@@ -26,7 +26,7 @@ MultiLayerNet* create_multi_layer_net(
     net->W[0] = create_matrix(input_size, hidden_size);
     net->b[0] = create_vector(hidden_size);
     net->A[0] = create_affine(net->W[0], net->b[0]);
-    net->R[0] = create_relu(batch_size, hidden_size);
+    net->R[0] = create_relu();
 
     for (int i = 1; i < hidden_layer_num + 1; ++i) {
         if (i == hidden_layer_num) {
@@ -37,7 +37,7 @@ MultiLayerNet* create_multi_layer_net(
             net->W[i] = create_matrix(hidden_size, hidden_size);
             net->b[i] = create_vector(hidden_size);
             net->A[i] = create_affine(net->W[i], net->b[i]);
-            net->R[i] = create_relu(batch_size, hidden_size);
+            net->R[i] = create_relu();
         }
     }
 

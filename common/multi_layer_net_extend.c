@@ -40,7 +40,7 @@ MultiLayerNetExtend* create_multi_layer_net_extend(
     net->beta[0]  = create_vector(hidden_size);
     net->B[0]     = create_batch_normalization(net->gamma[0], net->beta[0], 0.9);
 
-    net->R[0] = create_relu(batch_size, hidden_size);
+    net->R[0] = create_relu();
 
     if (use_dropout) {
         net->D[0] = create_dropout(dropout_ratio);
@@ -60,7 +60,7 @@ MultiLayerNetExtend* create_multi_layer_net_extend(
             net->beta[i]  = create_vector(hidden_size);
             net->B[i]     = create_batch_normalization(net->gamma[i], net->beta[i], 0.9);
 
-            net->R[i] = create_relu(batch_size, hidden_size);
+            net->R[i] = create_relu();
 
             if (use_dropout) {
                 net->D[i] = create_dropout(dropout_ratio);

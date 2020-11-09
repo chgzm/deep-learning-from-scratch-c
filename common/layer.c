@@ -78,7 +78,7 @@ static void free_mask(Mask* m) {
     free(m);
 }
 
-Relu* create_relu(int rows, int cols) {
+Relu* create_relu() {
     Relu* r = malloc(sizeof(Relu));
     r->mask = NULL;
     return r;
