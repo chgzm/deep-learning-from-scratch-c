@@ -13,7 +13,7 @@
 #define BATCH_SIZE 128
 
 static void process(int weight_init, double** train_images, uint8_t* train_labels, double** test_images, uint8_t* test_labels, double weight) {
-    MultiLayerNet* net = create_multi_layer_net(784, 4, 100, 10, BATCH_SIZE, weight_init, weight);
+    MultiLayerNet* net = create_multi_layer_net(784, 4, 100, 10, BATCH_SIZE, weight_init, weight, 0);
     const double lr = 0.01;
 
     char* filename = NULL;

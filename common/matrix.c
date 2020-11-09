@@ -253,6 +253,17 @@ void scalar_matrix(Matrix* M, double k) {
     }
 }
 
+Matrix* _scalar_matrix(const Matrix* M, double k) {
+    Matrix* R = create_matrix(M->rows, M->cols);
+    for (int i = 0; i < M->rows; ++i) {
+        for (int j = 0; j < M->cols; ++j) {
+            R->elements[i][j] = M->elements[i][j] * k;
+        }
+    }
+
+    return R;
+}
+
 void scalar_vector(Vector* V, double k) {
     for (int i = 0; i < V->size; ++i) {
         V->elements[i] *= k;
@@ -269,6 +280,17 @@ Matrix* transpose(const Matrix* M) {
     }
 
     return N;
+}
+
+double matrix_sum(const Matrix* M) {
+    double sum = 0.0;
+    for (int i = 0; i < M->rows; ++i) {
+        for (int j = 0; j < M->cols; ++j) {
+            sum += M->elements[i][j];
+        }
+    }
+
+    return sum;
 }
 
 Vector* matrix_col_sum(const Matrix* M) {
@@ -307,9 +329,9 @@ Matrix* matrix_add_vector(const Matrix* M, const Vector* V) {
 
 Matrix* matrix_add_matrix(const Matrix* M, const Matrix* N) {
     Matrix* R = create_matrix(M->rows, M->cols);
-    for (int i = 0; i < M->cols; ++i) {
-        for (int j = 0; j < M->rows; ++j) {
-            R->elements[j][i] = M->elements[j][i] + N->elements[i][j];
+    for (int i = 0; i < M->rows; ++i) {
+        for (int j = 0; j < M->cols; ++j) {
+            R->elements[i][j] = M->elements[i][j] + N->elements[i][j];
         }
     }
 

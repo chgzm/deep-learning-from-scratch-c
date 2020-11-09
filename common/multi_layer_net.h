@@ -14,6 +14,7 @@ struct MultiLayerNet {
     int input_size;
     int hidden_size;
     int hidden_layer_num;
+    double weight_decay_lambda;
 };
 
 MultiLayerNet* create_multi_layer_net(
@@ -23,7 +24,8 @@ MultiLayerNet* create_multi_layer_net(
     int output_size,
     int batch_size,
     int weight_type,
-    double weight
+    double weight,
+    double weight_decay_lambda
 );
 
 enum WEIGHT_TYPE {

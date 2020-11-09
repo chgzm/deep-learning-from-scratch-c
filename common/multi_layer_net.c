@@ -13,7 +13,8 @@ MultiLayerNet* create_multi_layer_net(
     int output_size,
     int batch_size,
     int weight_type,
-    double weight
+    double weight,
+    double weight_decay_lambda
 ) {
     MultiLayerNet* net = malloc(sizeof(MultiLayerNet));
 
@@ -44,6 +45,7 @@ MultiLayerNet* create_multi_layer_net(
     net->input_size = input_size;
     net->hidden_size = hidden_size;
     net->hidden_layer_num = hidden_layer_num;
+    net->weight_decay_lambda = weight_decay_lambda;
 
     // init weight
     switch (weight_type) {
@@ -104,8 +106,16 @@ double multi_layer_net_loss(MultiLayerNet* net, const Matrix* X, const Vector* t
     Matrix* Y = predict(net, X);
     const double v = softmax_with_loss_forward(net->S, Y, t); 
 
+    double weight_decay = 0;
+    for (int i = 0; i < net->hidden_layer_num + 1; ++i) {
+        Matrix* tmp = pow_matrix(net->W[i], 2);
+        const double sum = matrix_sum(tmp);
+
+        weight_decay += 0.5 * net->weight_decay_lambda * sum;
+    }
+
     free(Y);
-    return v;
+    return v + weight_decay;
 }
 
 void multi_layer_net_gradient(MultiLayerNet* net, const Matrix* X, const Vector* t) {
