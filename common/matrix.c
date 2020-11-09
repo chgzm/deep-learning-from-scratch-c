@@ -119,6 +119,14 @@ void init_matrix_random(Matrix* M) {
     }
 }
 
+void init_matrix_rand(Matrix* M) {
+    for (int i = 0; i < M->rows; ++i) {
+        for (int j = 0; j < M->cols; ++j) {
+            M->elements[i][j] = (double)rand() / (double)RAND_MAX;
+        }
+    }
+}
+
 void init_vector_from_array(Vector* v, double* vals) {
     for (int i = 0; i < v->size; ++i) {
         v->elements[i] = vals[i];

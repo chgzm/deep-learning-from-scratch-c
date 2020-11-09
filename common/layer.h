@@ -49,6 +49,12 @@ struct BatchNormalization {
     int batch_size;
 };
 
+typedef struct Dropout Dropout;
+struct Dropout {
+    double dropout_ratio;
+    Mask* mask;
+};
+
 Affine* create_affine(Matrix* W, Vector* b);
 Matrix* affine_forward(Affine* A, const Matrix* X);
 Matrix* affine_backward(Affine* A, const Matrix* D);
@@ -64,5 +70,9 @@ Matrix* softmax_with_loss_backward(const SoftmaxWithLoss* sft);
 BatchNormalization* create_batch_normalization(Vector* g, Vector* b, double momentum);
 Matrix* batch_normalization_forward(BatchNormalization* B, const Matrix* X);
 Matrix* batch_normalization_backward(BatchNormalization* B, const Matrix* D);
+
+Dropout* create_dropout(double dropout_ratio);
+Matrix* dropout_forward(Dropout* D, const Matrix* X);
+Matrix* dropout_backward(const Dropout* D, const Matrix* X);
 
 #endif

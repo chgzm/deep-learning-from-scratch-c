@@ -12,19 +12,25 @@ MultiLayerNetExtend* create_multi_layer_net_extend(
     int output_size,
     int batch_size,
     int weight_type,
-    double weight
+    double weight,
+    bool use_dropout,
+    double dropout_ratio
 ) {
     MultiLayerNetExtend* net = malloc(sizeof(MultiLayerNetExtend));
 
-    net->W = malloc(sizeof(Matrix*)             * hidden_layer_num + 1);
-    net->b = malloc(sizeof(Vector*)             * hidden_layer_num + 1);
-    net->A = malloc(sizeof(Affine*)             * hidden_layer_num + 1);
+    net->W = malloc(sizeof(Matrix*) * hidden_layer_num + 1);
+    net->b = malloc(sizeof(Vector*) * hidden_layer_num + 1);
+    net->A = malloc(sizeof(Affine*) * hidden_layer_num + 1);
 
     net->gamma = malloc(sizeof(Vector*)             * hidden_layer_num);
     net->beta  = malloc(sizeof(Vector*)             * hidden_layer_num);
     net->B     = malloc(sizeof(BatchNormalization*) * hidden_layer_num);
 
-    net->R = malloc(sizeof(Relu*)               * hidden_layer_num);
+    net->R = malloc(sizeof(Relu*) * hidden_layer_num);
+
+    if (use_dropout) {
+        net->D = malloc(sizeof(Dropout*) * hidden_layer_num);
+    }
 
     net->W[0] = create_matrix(input_size, hidden_size);
     net->b[0] = create_vector(hidden_size);
@@ -35,6 +41,10 @@ MultiLayerNetExtend* create_multi_layer_net_extend(
     net->B[0]     = create_batch_normalization(net->gamma[0], net->beta[0], 0.9);
 
     net->R[0] = create_relu(batch_size, hidden_size);
+
+    if (use_dropout) {
+        net->D[0] = create_dropout(dropout_ratio);
+    }
 
     for (int i = 1; i < hidden_layer_num + 1; ++i) {
         if (i == hidden_layer_num) {
@@ -51,6 +61,10 @@ MultiLayerNetExtend* create_multi_layer_net_extend(
             net->B[i]     = create_batch_normalization(net->gamma[i], net->beta[i], 0.9);
 
             net->R[i] = create_relu(batch_size, hidden_size);
+
+            if (use_dropout) {
+                net->D[i] = create_dropout(dropout_ratio);
+            }
         }
     }
 
@@ -58,6 +72,7 @@ MultiLayerNetExtend* create_multi_layer_net_extend(
     net->input_size = input_size;
     net->hidden_size = hidden_size;
     net->hidden_layer_num = hidden_layer_num;
+    net->use_dropout = use_dropout;
 
     // init weight
     switch (weight_type) {
@@ -106,6 +121,13 @@ static Matrix* predict(const MultiLayerNetExtend* net, const Matrix* X) {
         if (i != net->hidden_layer_num) {
             Matrix* X2 = batch_normalization_forward(net->B[i], X1); 
             X_tmp = relu_forward(net->R[i], X2);
+
+            if (net->use_dropout) {
+                Matrix* X3 = X_tmp;
+                X_tmp = dropout_forward(net->D[i], X3);
+                free_matrix(X3);
+            }
+
             free_matrix(X1);
             free_matrix(X2);
         } else {
@@ -132,6 +154,13 @@ void multi_layer_net_extend_gradient(MultiLayerNetExtend* net, const Matrix* X, 
     free_matrix(X1);
 
     for (int i = net->hidden_layer_num - 1; i >= 0; --i) {
+        if (net->use_dropout) {
+            Matrix* X_tmp = X2;
+            X2 = dropout_backward(net->D[i], X_tmp);
+            free_matrix(X_tmp); 
+        }
+
+
         Matrix* X3 = relu_backward(net->R[i], X2);  
         free_matrix(X2);
 

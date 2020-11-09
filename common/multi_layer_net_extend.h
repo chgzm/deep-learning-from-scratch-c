@@ -14,10 +14,12 @@ struct MultiLayerNetExtend {
     Vector**             beta; 
     BatchNormalization** B;
     Relu**               R;
+    Dropout**            D;
     SoftmaxWithLoss*     S;
     int input_size;
     int hidden_size;
     int hidden_layer_num;
+    bool use_dropout;
 };
 
 MultiLayerNetExtend* create_multi_layer_net_extend(
@@ -27,7 +29,9 @@ MultiLayerNetExtend* create_multi_layer_net_extend(
     int output_size,
     int batch_size,
     int weight_type,
-    double weight
+    double weight,
+    bool use_dropout,
+    double dropout_ratio
 );
 
 void multi_layer_net_extend_gradient(MultiLayerNetExtend* net, const Matrix* X, const Vector* t);

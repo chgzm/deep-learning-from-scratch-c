@@ -29,7 +29,7 @@ static void process(double** train_images, uint8_t* train_labels) {
         }
 
         MultiLayerNet* net = create_multi_layer_net(784, 5, 100, 10, BATCH_SIZE, STD, weight_scale_list[i], 0);
-        MultiLayerNetExtend* net_bn = create_multi_layer_net_extend(784, 5, 100, 10, BATCH_SIZE, STD, weight_scale_list[i]);
+        MultiLayerNetExtend* net_bn = create_multi_layer_net_extend(784, 5, 100, 10, BATCH_SIZE, STD, weight_scale_list[i], false, 0.0);
         const double lr = 0.01;
 
         int epoch_cnt = 0;

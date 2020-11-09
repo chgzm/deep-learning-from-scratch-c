@@ -311,3 +311,52 @@ Matrix* batch_normalization_backward(BatchNormalization* B, const Matrix* D) {
 
     return dx;
 }
+
+Dropout* create_dropout(double dropout_ratio) {
+    Dropout* d = malloc(sizeof(Dropout));
+    d->dropout_ratio = dropout_ratio;
+    d->mask = NULL;
+    return d;
+}
+
+Matrix* dropout_forward(Dropout* D, const Matrix* X) {
+    if (D->mask != NULL) {
+        free_mask(D->mask);
+    }
+
+    Matrix* RND = create_matrix(X->rows, X->cols);
+    init_matrix_rand(RND);
+    Matrix* M = create_matrix(X->rows, X->cols);
+    D->mask = create_mask(X->rows, X->cols);
+
+    for (int i = 0; i < M->rows; ++i) {
+        for (int j = 0; j < M->cols; ++j) {
+            if (RND->elements[i][j] > D->dropout_ratio) {
+                D->mask->elements[i][j] = true;
+                M->elements[i][j] = X->elements[i][j];
+            } else {
+                D->mask->elements[i][j] = false;
+                M->elements[i][j] = 0;
+            }
+        }
+    }
+
+    free_matrix(RND);
+
+    return M;
+}
+
+Matrix* dropout_backward(const Dropout* D, const Matrix* X) {
+    Matrix* M = create_matrix(X->rows, X->cols);
+    for (int i = 0; i < M->rows; ++i) {
+        for (int j = 0; j < M->cols; ++j) {
+            if (D->mask->elements[i][j]) {
+                M->elements[i][j] = X->elements[i][j];
+            } else {
+                M->elements[i][j] = 0;
+            }
+        }
+    }
+
+    return M;
+}
