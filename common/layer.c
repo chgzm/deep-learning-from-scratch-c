@@ -13,6 +13,15 @@ Affine* create_affine(Matrix* W, Vector* b) {
     return A;
 }
 
+void free_affine(Affine* A) {
+    free_matrix(A->W); 
+    free_vector(A->b); 
+    free_matrix(A->X);
+    free_matrix(A->dW);
+    free_vector(A->db);
+    free(A);
+}
+
 Matrix* affine_forward(Affine* A, const Matrix* X) { 
     if (A->X != NULL) {
         free_matrix(A->X);
@@ -84,6 +93,11 @@ Relu* create_relu() {
     return r;
 }
 
+void free_relu(Relu* R) {
+    free_mask(R->mask);
+    free(R);
+}
+
 Matrix* relu_forward(Relu* R, const Matrix* X) {
     if (R->mask != NULL) {
         free_mask(R->mask);
@@ -123,6 +137,12 @@ Matrix* relu_backward(Relu* R, const Matrix* D) {
 SoftmaxWithLoss* create_softmax_with_loss() {
     SoftmaxWithLoss* sft = calloc(1, sizeof(SoftmaxWithLoss));
     return sft;
+}
+
+void free_softmax_with_loss(SoftmaxWithLoss* S) {
+    free_matrix(S->Y);
+    free_vector(S->t);
+    free(S);
 }
 
 static double cross_entropy_error(const Matrix* Y, const Vector* t) {
@@ -188,6 +208,21 @@ BatchNormalization* create_batch_normalization(Vector* g, Vector* b, double mome
     B->momentum = momentum;
 
     return B;
+}
+
+void free_batch_normalization(BatchNormalization* B) {
+    free_vector(B->g);
+    free_vector(B->b);
+    free_vector(B->dg);
+    free_vector(B->db);
+
+    free_matrix(B->xc);
+    free_matrix(B->xn);
+    free_vector(B->std);
+    free_vector(B->running_mean);
+    free_vector(B->running_var);
+
+    free(B);
 }
 
 Matrix* batch_normalization_forward(BatchNormalization* B, const Matrix* X) {
@@ -317,6 +352,11 @@ Dropout* create_dropout(double dropout_ratio) {
     d->dropout_ratio = dropout_ratio;
     d->mask = NULL;
     return d;
+}
+
+void free_dropout(Dropout* D) {
+    free_mask(D->mask);
+    free(D);
 }
 
 Matrix* dropout_forward(Dropout* D, const Matrix* X) {
