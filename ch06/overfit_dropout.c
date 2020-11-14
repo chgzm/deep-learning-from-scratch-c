@@ -44,12 +44,12 @@ int main() {
 
     MultiLayerNetExtend* net = create_multi_layer_net_extend(784, 6, 100, 10, MINI_BATCH_SIZE, He, 0, true, DROPOUT_RATIO);
 
-    Trainer* trainer = create_trainer(
+    TrainerExtend* trainer = create_trainer_extend(
         net, train_images, train_labels, test_images, test_labels, EPOCHS, MINI_BATCH_SIZE, SGD,
         TRAIN_SIZE, LEARNING_RATE
     );
 
-    trainer_train(trainer);
+    trainer_extend_train(trainer);
 
     FILE* fp = fopen("overfit_dropout.txt", "w");
     if (!fp) {
