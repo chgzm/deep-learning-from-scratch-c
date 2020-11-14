@@ -78,3 +78,9 @@ double* logspace(double start, double stop, int num) {
 
     return ret;
 }
+
+double uniform(double start, double stop) {
+    double v = ((double)(rand()) + 1.0) / ((double)(RAND_MAX) + 2.0);
+    v *= (stop - start);
+    return v + start;
+}
