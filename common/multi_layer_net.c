@@ -80,6 +80,24 @@ MultiLayerNet* create_multi_layer_net(
     return net;
 }
 
+void free_multi_layer_net(MultiLayerNet* net) {
+    for (int i = 0; i < net->hidden_layer_num + 1; ++i) {
+        free_affine(net->A[i]);
+
+        if (i != net->hidden_layer_num) {
+            free_relu(net->R[i]);
+        }
+    }
+
+    free_softmax_with_loss(net->S);
+    free(net->W);
+    free(net->b);
+    free(net->A);
+    free(net->R);
+
+    free(net);
+}
+
 static Matrix* predict(const MultiLayerNet* net, const Matrix* X) {
     Matrix* X_tmp = NULL;
     for (int i = 0; i < net->hidden_layer_num + 1; ++i) {
@@ -112,6 +130,7 @@ double multi_layer_net_loss(MultiLayerNet* net, const Matrix* X, const Vector* t
         const double sum = matrix_sum(tmp);
 
         weight_decay += 0.5 * net->weight_decay_lambda * sum;
+        free_matrix(tmp);
     }
 
     free(Y);

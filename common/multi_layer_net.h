@@ -17,6 +17,12 @@ struct MultiLayerNet {
     double weight_decay_lambda;
 };
 
+enum WEIGHT_TYPE {
+    STD,
+    Xavier,
+    He, 
+};
+
 MultiLayerNet* create_multi_layer_net(
     int input_size, 
     int hidden_layer_num, 
@@ -28,11 +34,7 @@ MultiLayerNet* create_multi_layer_net(
     double weight_decay_lambda
 );
 
-enum WEIGHT_TYPE {
-    STD,
-    Xavier,
-    He, 
-};
+void free_multi_layer_net(MultiLayerNet* net);
 
 void multi_layer_net_gradient(MultiLayerNet* net, const Matrix* X, const Vector* t);
 double multi_layer_net_loss(MultiLayerNet* net, const Matrix* X, const Vector* t);
