@@ -87,7 +87,7 @@ void trainer_train(Trainer* trainer) {
         trainer_train_step(trainer);
     }
 
-    const double test_acc = multi_layer_net_accuracy(trainer->net, trainer->test_images, trainer->test_labels, trainer->train_size);
+    const double test_acc = multi_layer_net_accuracy(trainer->net, trainer->test_images, trainer->test_labels, trainer->test_size);
     if (trainer->verbose) {
         printf("=============== Final Test Accuracy ===============\n");
         printf("test acc:%lf\n", test_acc);
@@ -185,7 +185,7 @@ void trainer_extend_train(TrainerExtend* trainer) {
         trainer_extend_train_step(trainer);
     }
 
-    const double test_acc = multi_layer_net_extend_accuracy(trainer->net, trainer->test_images, trainer->test_labels, trainer->train_size);
+    const double test_acc = multi_layer_net_extend_accuracy(trainer->net, trainer->test_images, trainer->test_labels, trainer->test_size);
     if (trainer->verbose) {
         printf("=============== Final Test Accuracy ===============\n");
         printf("test acc:%lf\n", test_acc);
