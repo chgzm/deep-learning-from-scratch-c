@@ -16,7 +16,9 @@ Trainer* create_trainer(
     int mini_batch_size,
     int optimizer_type,
     int train_size,
-    double learning_rate
+    int test_size,
+    double learning_rate,
+    bool verbose
 ) {
     Trainer* trainer = malloc(sizeof(Trainer));
 
@@ -29,7 +31,9 @@ Trainer* create_trainer(
     trainer->mini_batch_size = mini_batch_size;
     trainer->optimizer_type  = optimizer_type;
     trainer->train_size      = train_size;
+    trainer->test_size       = test_size;
     trainer->learning_rate   = learning_rate;
+    trainer->verbose         = verbose;
 
     trainer->iter_per_epoch = train_size / mini_batch_size;
     trainer->max_iter = trainer->epochs * trainer->iter_per_epoch;
@@ -59,8 +63,11 @@ static void trainer_train_step(Trainer* trainer) {
 
     if (trainer->current_iter % trainer->iter_per_epoch == 0) {
         const double train_acc = multi_layer_net_accuracy(trainer->net, trainer->train_images, trainer->train_labels, trainer->train_size);
-        const double test_acc  = multi_layer_net_accuracy(trainer->net, trainer->test_images,  trainer->test_labels, NUM_OF_TEST_IMAGES);
-        printf("epoch:%d train acc, test acc | %lf, %lf\n", trainer->current_epoch, train_acc, test_acc);
+        const double test_acc  = multi_layer_net_accuracy(trainer->net, trainer->test_images,  trainer->test_labels, trainer->test_size);
+
+        if (trainer->verbose) {
+            printf("epoch:%d train acc, test acc | %lf, %lf\n", trainer->current_epoch, train_acc, test_acc);
+        }
 
         trainer->train_acc_list[trainer->current_epoch] = train_acc;
         trainer->test_acc_list[trainer->current_epoch]  = test_acc;
@@ -81,8 +88,10 @@ void trainer_train(Trainer* trainer) {
     }
 
     const double test_acc = multi_layer_net_accuracy(trainer->net, trainer->test_images, trainer->test_labels, trainer->train_size);
-    printf("=============== Final Test Accuracy ===============\n");
-    printf("test acc:%lf\n", test_acc);
+    if (trainer->verbose) {
+        printf("=============== Final Test Accuracy ===============\n");
+        printf("test acc:%lf\n", test_acc);
+    }
 }
 
 //
@@ -99,7 +108,9 @@ TrainerExtend* create_trainer_extend(
     int mini_batch_size,
     int optimizer_type,
     int train_size,
-    double learning_rate
+    int test_size,
+    double learning_rate,
+    bool verbose
 ) {
     TrainerExtend* trainer = malloc(sizeof(TrainerExtend));
 
@@ -112,7 +123,9 @@ TrainerExtend* create_trainer_extend(
     trainer->mini_batch_size = mini_batch_size;
     trainer->optimizer_type  = optimizer_type;
     trainer->train_size      = train_size;
+    trainer->test_size       = test_size;
     trainer->learning_rate   = learning_rate;
+    trainer->verbose         = verbose;
 
     trainer->iter_per_epoch = train_size / mini_batch_size;
     trainer->max_iter = trainer->epochs * trainer->iter_per_epoch;
@@ -148,8 +161,11 @@ static void trainer_extend_train_step(TrainerExtend* trainer) {
 
     if (trainer->current_iter % trainer->iter_per_epoch == 0) {
         const double train_acc = multi_layer_net_extend_accuracy(trainer->net, trainer->train_images, trainer->train_labels, trainer->train_size);
-        const double test_acc  = multi_layer_net_extend_accuracy(trainer->net, trainer->test_images,  trainer->test_labels, NUM_OF_TEST_IMAGES);
-        printf("epoch:%d train acc, test acc | %lf, %lf\n", trainer->current_epoch, train_acc, test_acc);
+        const double test_acc  = multi_layer_net_extend_accuracy(trainer->net, trainer->test_images,  trainer->test_labels, trainer->test_size);
+
+        if (trainer->verbose) {
+            printf("epoch:%d train acc, test acc | %lf, %lf\n", trainer->current_epoch, train_acc, test_acc);
+        }
 
         trainer->train_acc_list[trainer->current_epoch] = train_acc;
         trainer->test_acc_list[trainer->current_epoch]  = test_acc;
@@ -170,7 +186,9 @@ void trainer_extend_train(TrainerExtend* trainer) {
     }
 
     const double test_acc = multi_layer_net_extend_accuracy(trainer->net, trainer->test_images, trainer->test_labels, trainer->train_size);
-    printf("=============== Final Test Accuracy ===============\n");
-    printf("test acc:%lf\n", test_acc);
+    if (trainer->verbose) {
+        printf("=============== Final Test Accuracy ===============\n");
+        printf("test acc:%lf\n", test_acc);
+    }
 }
 

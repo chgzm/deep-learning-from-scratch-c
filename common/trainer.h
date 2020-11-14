@@ -15,6 +15,7 @@ struct Trainer {
     int mini_batch_size;
     int optimizer_type;
     int train_size;
+    int test_size;
     int iter_per_epoch;
     int max_iter;
     int current_iter;
@@ -22,6 +23,7 @@ struct Trainer {
     double learning_rate;
     double* train_acc_list;
     double* test_acc_list;
+    bool verbose;
 };
 
 Trainer* create_trainer(
@@ -34,7 +36,9 @@ Trainer* create_trainer(
     int mini_batch_size,
     int optimizer_type,
     int train_size,
-    double learning_rate
+    int test_size,
+    double learning_rate,
+    bool verbose
 );
 
 //
@@ -52,6 +56,7 @@ struct TrainerExtend {
     int mini_batch_size;
     int optimizer_type;
     int train_size;
+    int test_size;
     int iter_per_epoch;
     int max_iter;
     int current_iter;
@@ -59,6 +64,7 @@ struct TrainerExtend {
     double learning_rate;
     double* train_acc_list;
     double* test_acc_list;
+    bool verbose;
 };
 
 TrainerExtend* create_trainer_extend(
@@ -71,7 +77,9 @@ TrainerExtend* create_trainer_extend(
     int mini_batch_size,
     int optimizer_type,
     int train_size,
-    double learning_rate
+    int test_size,
+    double learning_rate,
+    bool verbose
 );
 
 void trainer_train();

@@ -46,7 +46,7 @@ int main() {
 
     TrainerExtend* trainer = create_trainer_extend(
         net, train_images, train_labels, test_images, test_labels, EPOCHS, MINI_BATCH_SIZE, SGD,
-        TRAIN_SIZE, LEARNING_RATE
+        TRAIN_SIZE, NUM_OF_TEST_IMAGES, LEARNING_RATE, true
     );
 
     trainer_extend_train(trainer);
