@@ -41,6 +41,10 @@ Trainer* create_trainer(
     bool verbose
 );
 
+void free_trainer(Trainer* trainer);
+
+void trainer_train(Trainer* trainer);
+
 //
 // TrainerExtend
 //
@@ -82,7 +86,8 @@ TrainerExtend* create_trainer_extend(
     bool verbose
 );
 
-void trainer_train();
-void trainer_extend_train();
+void free_trainer_extend(TrainerExtend* trainer);
+
+void trainer_extend_train(TrainerExtend* trainer);
 
 #endif

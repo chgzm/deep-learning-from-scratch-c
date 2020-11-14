@@ -47,6 +47,14 @@ Trainer* create_trainer(
     return trainer;
 }
 
+void free_trainer(Trainer* trainer) {
+    free_multi_layer_net(trainer->net);
+
+    free(trainer->train_acc_list);
+    free(trainer->test_acc_list);
+
+    free(trainer);
+}
 
 static void trainer_train_step(Trainer* trainer) {
     int* batch_index = choice(trainer->train_size, trainer->mini_batch_size);
