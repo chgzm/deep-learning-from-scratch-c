@@ -4,7 +4,7 @@ SRCS=$(wildcard ./../common/*.c)
 OBJS=$(SRCS:.c=.o)
 CC=gcc
 
-all: optimizer_compare_naive optimizer_compare_mnist weight_init_activation_histogram weight_init_compare batch_norm_test overfit_weight_decay overfit_dropout
+all: optimizer_compare_naive optimizer_compare_mnist weight_init_activation_histogram weight_init_compare batch_norm_test overfit_weight_decay overfit_dropout hyperparameter_optimization
 
 #optimizer_compare_naive.o: optimizer_compare_naive.c
 #	gcc -c optimizer_compare_naive.c $(INCLUDE) $(CFLAGS) -lm
@@ -29,6 +29,9 @@ overfit_weight_decay: $(OBJS) overfit_weight_decay.c
 
 overfit_dropout: $(OBJS) overfit_dropout.c
 	$(CC) overfit_dropout.c $(INCLUDE) -o $@ $(OBJS) $(CFLAGS) -lm
+
+hyperparameter_optimization: $(OBJS) hyperparameter_optimization.c
+	$(CC) hyperparameter_optimization.c $(INCLUDE) -o $@ $(OBJS) $(CFLAGS) -lm
 
 
 clean:
