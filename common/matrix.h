@@ -16,6 +16,12 @@ struct Matrix {
     double** elements;
 };
 
+typedef struct Matrix4d Matrix4d;
+struct Matrix4d {
+    int sizes[4];
+    double **** elements;
+};
+
 //
 // factory
 //
@@ -23,6 +29,7 @@ struct Matrix {
 Vector* create_vector(int size);
 Vector* create_vector_initval(int size, double init_val);
 Matrix* create_matrix(int rows, int cols);
+Matrix4d* create_matrix_4d(int s1, int s2, int s3, int s4);
 
 //
 // init
@@ -42,6 +49,7 @@ void copy_vector(Vector* dst, const Vector* src);
 
 void free_vector(Vector* v);
 void free_matrix(Matrix* M);
+void free_matrix_4d(Matrix4d* M);
 
 //
 // Operator
@@ -76,6 +84,7 @@ void scalar_vector(Vector* V, double k);
 //
 
 Matrix* create_image_batch(double** images, const int* batch_index, int size);
+Matrix4d* create_image_batch_4d(double** images, const int* batch_index, int size);
 Vector* create_label_batch(uint8_t* labels, const int* batch_index, int size);
 
 //

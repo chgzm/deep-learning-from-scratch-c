@@ -41,6 +41,27 @@ Matrix* create_matrix(int rows, int cols) {
     return M;
 }
 
+Matrix4d* create_matrix_4d(int s1, int s2, int s3, int s4) {
+    Matrix4d* M = malloc(sizeof(Matrix4d));
+    M->sizes[0] = s1;
+    M->sizes[1] = s2;
+    M->sizes[2] = s3;
+    M->sizes[3] = s4;
+
+    M->elements = calloc(s1, sizeof(double***));
+    for (int i = 0; i < s1; ++i) {
+        M->elements[i] = calloc(s2, sizeof(double**));
+        for (int j = 0; j < s2; ++j) {
+            M->elements[i][j] = calloc(s3, sizeof(double*));
+            for (int k = 0; k < s3; ++k) {
+                M->elements[i][j][k] = calloc(s4, sizeof(double));
+            }
+        }
+    }
+
+    return M;
+}
+
 //
 // init
 //
@@ -144,6 +165,20 @@ void free_vector(Vector* v) {
 
 void free_matrix(Matrix* M) {
     for (int i = 0; i < M->rows; ++i) {
+        free(M->elements[i]);
+    }
+    free(M->elements);
+    free(M);
+}
+
+void free_matrix_4d(Matrix4d* M) {
+    for (int i = 0; i < M->sizes[0]; ++i) {
+        for (int j = 0; j < M->sizes[1]; ++j) {
+            for (int k = 0; k < M->sizes[2]; ++k) {
+                free(M->elements[i][j][k]);
+            }
+            free(M->elements[i][j]);
+        }
         free(M->elements[i]);
     }
     free(M->elements);
@@ -405,6 +440,19 @@ Matrix* create_image_batch(double** images, const int* batch_index, int size) {
     for (int i = 0; i < size; ++i) {
         for (int j = 0; j < NUM_OF_PIXELS; ++j) {
             M->elements[i][j] = images[batch_index[i]][j];
+        }
+    }
+
+    return M;
+}
+
+Matrix4d* create_image_batch_4d(double** images, const int* batch_index, int size) {
+    Matrix4d* M = create_matrix_4d(size, 1, NUM_OF_ROWS, NUM_OF_COLS);
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < NUM_OF_ROWS; ++j) {
+            for (int k = 0; k < NUM_OF_COLS; ++k) {
+                M->elements[i][0][j][k] = images[batch_index[i]][j * NUM_OF_ROWS + k];
+            }
         }
     }
 
