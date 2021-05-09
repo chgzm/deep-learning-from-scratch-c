@@ -1,17 +1,22 @@
-CFLAGS=-Wall -O3
+CC := gcc
+CFLAGS := -Wall -O3
 INCLUDE := -I./../common/
-SRCS=$(wildcard ./../common/*.c)
-OBJS=$(SRCS:.c=.o)
+LIBS := -lm
 
-all: train_neuralnet
+SRCS := $(wildcard ./../common/*.c)
+SRCS += train_neuralnet.c
+SRCS += twolayernet.c
+OBJS := $(SRCS:.c=.o)
 
-twolayernet.o: twolayernet.c
-	gcc -c twolayernet.c $(INCLUDE) $(CFLAGS) -lm
+TARGET := train_neuralnet
 
-train_neuralnet: $(OBJS) twolayernet.o
-	gcc train_neuralnet.c $(INCLUDE) -o $@ $(OBJS) twolayernet.o $(CFLAGS) -lm
+$(TARGET): $(OBJS)
+	$(CC) $(INCLUDE) $(CFLAGS) -o $@ $(OBJS) $(LIBS)
 
-clean:
-	rm -f train_neuralnet ./../common/*.o ./*.o
+%.o: %.c
+	$(CC) $(INCLUDE) $(CFLAGS) -c $< -o $@ $(LIBS)
 
 .PHONY: clean
+clean:
+	rm -f $(TARGET) $(OBJS)
+

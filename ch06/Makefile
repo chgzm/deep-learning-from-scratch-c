@@ -1,40 +1,40 @@
-CFLAGS=-Wall -O3
+CC := gcc
+CFLAGS := -Wall -O3
 INCLUDE := -I./../common/
-SRCS=$(wildcard ./../common/*.c)
-OBJS=$(SRCS:.c=.o)
-CC=gcc
+LIBS := -lm
 
-all: optimizer_compare_naive optimizer_compare_mnist weight_init_activation_histogram weight_init_compare batch_norm_test overfit_weight_decay overfit_dropout hyperparameter_optimization
+SRCS := $(wildcard ./../common/*.c)
+OBJS := $(SRCS:.c=.o)
 
-#optimizer_compare_naive.o: optimizer_compare_naive.c
-#	gcc -c optimizer_compare_naive.c $(INCLUDE) $(CFLAGS) -lm
+TARGETS := optimizer_compare_naive optimizer_compare_mnist weight_init_activation_histogram weight_init_compare batch_norm_test overfit_weight_decay overfit_dropout hyperparameter_optimization
 
-optimizer_compare_naive: $(OBJS) optimizer_compare_naive.c
-	$(CC) optimizer_compare_naive.c $(INCLUDE) -o $@ $(OBJS) $(CFLAGS) -lm
+all: $(TARGETS) 
 
-optimizer_compare_mnist: $(OBJS) optimizer_compare_mnist.c
-	$(CC) optimizer_compare_mnist.c $(INCLUDE) -o $@ $(OBJS) $(CFLAGS) -lm
+optimizer_compare_naive: optimizer_compare_naive.c $(OBJS)
+	$(CC) $(INCLUDE) $(CFLAGS) -o $@ $< $(OBJS) $(LIBS)
 
-weight_init_activation_histogram: $(OBJS) weight_init_activation_histogram.c
-	$(CC) weight_init_activation_histogram.c $(INCLUDE) -o $@ $(OBJS) $(CFLAGS) -lm
+optimizer_compare_mnist: optimizer_compare_mnist.c $(OBJS)
+	$(CC) $(INCLUDE) $(CFLAGS) -o $@ $< $(OBJS) $(LIBS)
 
-weight_init_compare: $(OBJS) weight_init_compare.c
-	$(CC) weight_init_compare.c $(INCLUDE) -o $@ $(OBJS) $(CFLAGS) -lm
+weight_init_activation_histogram: weight_init_activation_histogram.c $(OBJS)
+	$(CC) $(INCLUDE) $(CFLAGS) -o $@ $< $(OBJS) $(LIBS)
 
-batch_norm_test: $(OBJS) batch_norm_test.c
-	$(CC) batch_norm_test.c $(INCLUDE) -o $@ $(OBJS) $(CFLAGS) -lm
+weight_init_compare: weight_init_compare.c $(OBJS)
+	$(CC) $(INCLUDE) $(CFLAGS) -o $@ $< $(OBJS) $(LIBS)
 
-overfit_weight_decay: $(OBJS) overfit_weight_decay.c
-	$(CC) overfit_weight_decay.c $(INCLUDE) -o $@ $(OBJS) $(CFLAGS) -lm
+batch_norm_test: batch_norm_test.c $(OBJS)
+	$(CC) $(INCLUDE) $(CFLAGS) -o $@ $< $(OBJS) $(LIBS)
 
-overfit_dropout: $(OBJS) overfit_dropout.c
-	$(CC) overfit_dropout.c $(INCLUDE) -o $@ $(OBJS) $(CFLAGS) -lm
+overfit_weight_decay: overfit_weight_decay.c $(OBJS)
+	$(CC) $(INCLUDE) $(CFLAGS) -o $@ $< $(OBJS) $(LIBS)
 
-hyperparameter_optimization: $(OBJS) hyperparameter_optimization.c
-	$(CC) hyperparameter_optimization.c $(INCLUDE) -o $@ $(OBJS) $(CFLAGS) -lm
+overfit_dropout: overfit_dropout.c $(OBJS)
+	$(CC) $(INCLUDE) $(CFLAGS) -o $@ $< $(OBJS) $(LIBS)
 
-
-clean:
-	rm -f optimizer_compare_naive optimizer_compare_mnist weight_init_activation_histogram weight_init_compare naive_*.txt ./../common/*.o ./*.o
+hyperparameter_optimization: hyperparameter_optimization.c $(OBJS)
+	$(CC) $(INCLUDE) $(CFLAGS) -o $@ $< $(OBJS) $(LIBS)
 
 .PHONY: clean
+clean:
+	rm -f $(TARGETS) $(OBJS)
+
