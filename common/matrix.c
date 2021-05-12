@@ -242,11 +242,15 @@ Matrix* dot_matrix(const Matrix* M, const Matrix* N) {
 }
 
 Matrix* product_vector_matrix(const Vector* V, const Matrix* M) {
-    Matrix* A = create_matrix(M->rows, M->cols);
+    if (V->size != M->cols) {
+        fprintf(stderr, "Invalid size. %d and (%d, %d)\n", V->size, M->rows, M->cols);
+        return NULL;
+    }
 
-    for (int i = 0; i < M->cols; ++i) {
-        for (int j = 0; j < M->rows; ++j) {
-            A->elements[j][i] = M->elements[j][i] * V->elements[i];
+    Matrix* A = create_matrix(M->rows, M->cols);
+    for (int i = 0; i < M->rows; ++i) {
+        for (int j = 0; j < M->cols; ++j) {
+            A->elements[i][j] = M->elements[i][j] * V->elements[j];
         }
     }
 
@@ -254,9 +258,13 @@ Matrix* product_vector_matrix(const Vector* V, const Matrix* M) {
 }
 
 Matrix* product_matrix(const Matrix* M, const Matrix* N) {
+    if (!(M->rows == N->rows && M->cols == N->cols)) {
+        fprintf(stderr, "Invalid size. (%d, %d) and (%d, %d)\n", M->rows, M->cols, N->rows, N->cols);
+        return NULL;
+    }
+    
     Matrix* A = create_matrix(M->rows, M->cols);
-
-     for (int i = 0; i < M->rows; ++i) {
+    for (int i = 0; i < M->rows; ++i) {
         for (int j = 0; j < M->cols; ++j) {
             A->elements[i][j] = M->elements[i][j] * N->elements[i][j];
         }
@@ -266,6 +274,11 @@ Matrix* product_matrix(const Matrix* M, const Matrix* N) {
 }
 
 Vector* product_vector(const Vector* V, const Vector* U) {
+    if (!(V->size == U->size)) {
+        fprintf(stderr, "Invalid size. %d and %d\n", V->size, U->size);
+        return NULL;
+    }
+
     Vector* R = create_vector(V->size);
     for (int i = 0; i < V->size; ++i) {
         R->elements[i] = V->elements[i] * U->elements[i];
