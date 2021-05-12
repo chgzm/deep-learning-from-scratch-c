@@ -274,7 +274,7 @@ Matrix* product_matrix(const Matrix* M, const Matrix* N) {
 }
 
 Vector* product_vector(const Vector* V, const Vector* U) {
-    if (!(V->size == U->size)) {
+    if (V->size != U->size) {
         fprintf(stderr, "Invalid size. %d and %d\n", V->size, U->size);
         return NULL;
     }
@@ -299,6 +299,20 @@ Vector* matrix_col_mean(const Matrix* M) {
     }
 
     return V;
+}
+
+Vector* matrix_col_sum(const Matrix* M) {
+    Vector* v = create_vector(M->cols);
+
+    for (int i = 0; i < M->cols; ++i) {
+        double sum = 0.0;
+        for (int j = 0; j < M->rows; ++j) {
+            sum += M->elements[j][i];
+        }
+        v->elements[i] = sum;
+    }
+
+    return v;
 }
 
 void scalar_matrix(Matrix* M, double k) {
@@ -349,34 +363,30 @@ double matrix_sum(const Matrix* M) {
     return sum;
 }
 
-Vector* matrix_col_sum(const Matrix* M) {
-    Vector* v = create_vector(M->cols);
-
-    for (int i = 0; i < M->cols; ++i) {
-        double sum = 0.0;
-        for (int j = 0; j < M->rows; ++j) {
-            sum += M->elements[j][i];
-        }
-        v->elements[i] = sum;
+Vector* vector_div_vector(const Vector* v, const Vector* u) {
+    if (v->size != u->size) {
+        fprintf(stderr, "Invalid size. %d and %d\n", v->size, u->size);
+        return NULL;
     }
 
-    return v;
-}
-
-Vector* vector_div_vector(const Vector* V, const Vector* U) {
-    Vector* r = create_vector(V->size);
-    for (int i = 0; i < V->size; ++i) {
-        r->elements[i] = V->elements[i] / U->elements[i];
+    Vector* r = create_vector(v->size);
+    for (int i = 0; i < v->size; ++i) {
+        r->elements[i] = v->elements[i] / u->elements[i];
     }
 
     return r;
 }
 
-Matrix* matrix_add_vector(const Matrix* M, const Vector* V) {
+Matrix* matrix_add_vector(const Matrix* M, const Vector* v) {
+    if (M->cols != v->size) {
+        fprintf(stderr, "Invalid size. (%d, %d) and %d\n", M->rows, M->cols, v->size);
+        return NULL;
+    }
+
     Matrix* N = create_matrix(M->rows, M->cols);
     for (int i = 0; i < M->cols; ++i) {
         for (int j = 0; j < M->rows; ++j) {
-            N->elements[j][i] = M->elements[j][i] + V->elements[i];
+            N->elements[j][i] = M->elements[j][i] + v->elements[i];
         }
     }
 
@@ -384,6 +394,11 @@ Matrix* matrix_add_vector(const Matrix* M, const Vector* V) {
 }
 
 Matrix* matrix_add_matrix(const Matrix* M, const Matrix* N) {
+    if (M->rows != N->rows || M->cols != N->cols) {
+        fprintf(stderr, "Invalid size. (%d, %d) and (%d, %d)\n", M->rows, M->cols, N->rows, N->cols);
+        return NULL;
+    }
+
     Matrix* R = create_matrix(M->rows, M->cols);
     for (int i = 0; i < M->rows; ++i) {
         for (int j = 0; j < M->cols; ++j) {
@@ -394,22 +409,32 @@ Matrix* matrix_add_matrix(const Matrix* M, const Matrix* N) {
     return R;
 }
 
-Matrix* matrix_sub_vector(const Matrix* M, const Vector* V) {
+Matrix* matrix_sub_vector(const Matrix* M, const Vector* v) {
+    if (M->cols != v->size) {
+        fprintf(stderr, "Invalid size. (%d, %d) and %d\n", M->rows, M->cols, v->size);
+        return NULL;
+    }
+
     Matrix* N = create_matrix(M->rows, M->cols);
     for (int i = 0; i < M->cols; ++i) {
         for (int j = 0; j < M->rows; ++j) {
-            N->elements[j][i] = M->elements[j][i] - V->elements[i];
+            N->elements[j][i] = M->elements[j][i] - v->elements[i];
         }
     }
 
     return N;
 }
 
-Matrix* matrix_div_vector(const Matrix* M, const Vector* V) {
+Matrix* matrix_div_vector(const Matrix* M, const Vector* v) {
+    if (M->cols != v->size) {
+        fprintf(stderr, "Invalid size. (%d, %d) and %d\n", M->rows, M->cols, v->size);
+        return NULL;
+    }
+
     Matrix* N = create_matrix(M->rows, M->cols);
     for (int i = 0; i < M->cols; ++i) {
         for (int j = 0; j < M->rows; ++j) {
-            N->elements[j][i] = M->elements[j][i] / V->elements[i];
+            N->elements[j][i] = M->elements[j][i] / v->elements[i];
         }
     }
 

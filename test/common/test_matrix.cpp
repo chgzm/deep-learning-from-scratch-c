@@ -2,6 +2,7 @@
 
 extern "C" {
 #include <matrix.h>
+#include <mnist.h>
 }
 
 // static const double EPS = 1e-10;
@@ -414,6 +415,25 @@ TEST(matrix_col_mean, success) {
     free_vector(v);
 }
 
+TEST(matrix_col_sum, success) {
+    Matrix* M = create_matrix(3, 4);
+    for (int i = 0; i < M->rows; ++i) {
+        for (int j = 0; j < M->cols; ++j) {
+            M->elements[i][j] = i * 4 + j + 1;
+        }
+    }
+
+    Vector* v = matrix_col_sum(M);
+    double ans[4] = {15, 18, 21, 24};
+    
+    for (int i = 0; i < 4; ++i) {
+        EXPECT_DOUBLE_EQ(ans[i], v->elements[i]);
+    }
+
+    free_matrix(M);
+    free_vector(v);
+}
+
 TEST(scalar_matrix, success) {
     Matrix* M = create_matrix(3, 3);
     for (int i = 0; i < M->rows; ++i) {
@@ -440,8 +460,7 @@ TEST(scalar_vector, success) {
     }
 
     scalar_vector(v, 3);
-    double ans[3] = {3, 6, 9};
-    for (int i = 0; i < v->size; ++i) {
+    double ans[3] = {3, 6, 9}; for (int i = 0; i < v->size; ++i) {
         EXPECT_DOUBLE_EQ(ans[i], v->elements[i]);
     }
 
@@ -467,5 +486,316 @@ TEST(transpose, success) {
 
     free_matrix(M);
     free_matrix(M_T);
+}
+
+TEST(matrix_sum, success) {
+    Matrix* M = create_matrix(3, 3);
+    for (int i = 0; i < M->rows; ++i) {
+        for (int j = 0; j < M->cols; ++j) {
+            M->elements[i][j] = i * 3 + j + 1;
+        }
+    }
+
+    const double sum =  matrix_sum(M);
+    EXPECT_DOUBLE_EQ(sum, 45);
+
+    free_matrix(M);
+}
+
+TEST(vector_div_vector, success) {
+    Vector* v = create_vector(3);
+    for (int i = 0; i < 3; ++i) {
+        v->elements[i] = (i + 1) * 5;
+    }
+
+    Vector* u = create_vector(3);
+    for (int i = 0; i < 3; ++i) {
+        u->elements[i] = 5;
+    }
+    
+    Vector* w = vector_div_vector(v, u);
+    EXPECT_NE(nullptr, w);
+
+    double ans[3] = {1, 2, 3};
+    for (int i = 0; i < w->size; ++i) {
+        EXPECT_DOUBLE_EQ(ans[i], w->elements[i]);
+    }
+
+    free_vector(v);
+    free_vector(u);
+    free_vector(w);
+}
+
+TEST(vector_div_vector, error) {
+    Vector* v = create_vector(3);
+    Vector* u = create_vector(4);
+    Vector* w = vector_div_vector(v, u);
+    EXPECT_EQ(nullptr, w);
+
+    free_vector(v);
+    free_vector(u);
+}
+
+TEST(matrix_add_vector, success) {
+    Matrix* M = create_matrix(3, 3);
+    for (int i = 0; i < M->rows; ++i) {
+        for (int j = 0; j < M->cols; ++j) {
+            M->elements[i][j] = i * 3 + j + 1;
+        }
+    }
+
+    Vector* v = create_vector(3);
+    v->elements[0] = 1;
+    v->elements[1] = 10;
+    v->elements[2] = 100;
+
+    Matrix* N = matrix_add_vector(M, v);
+    
+    EXPECT_NE(nullptr, N);
+
+    double ans[3][3] = {{2, 12, 103}, {5, 15, 106}, {8, 18, 109}};
+    for (int i = 0; i < N->rows; ++i) {
+        for (int j = 0; j < N->cols; ++j) {
+            EXPECT_DOUBLE_EQ(ans[i][j], N->elements[i][j]);
+        }
+    }
+
+    free_matrix(M);
+    free_vector(v);
+    free_matrix(N);
+}
+
+TEST(matrix_add_vector, error) {
+    Matrix* M = create_matrix(3, 3);
+    Vector* v = create_vector(4);
+    Matrix* N = matrix_add_vector(M, v);
+    EXPECT_EQ(nullptr, N);
+
+    free_matrix(M);
+    free_vector(v);
+}
+
+TEST(matrix_add_matrix, success) {
+    Matrix* M = create_matrix(3, 3);
+    for (int i = 0; i < M->rows; ++i) {
+        for (int j = 0; j < M->cols; ++j) {
+            M->elements[i][j] = i * 3 + j + 1;
+        }
+    }
+
+    Matrix* N = create_matrix(3, 3);
+    for (int i = 0; i < N->rows; ++i) {
+        for (int j = 0; j < N->cols; ++j) {
+            N->elements[i][j] = i * 3 + j + 1;
+        }
+    }
+
+    Matrix* A = matrix_add_matrix(M, N);
+    EXPECT_NE(nullptr, A);
+
+    double ans[3][3] = {{2, 4, 6}, {8, 10, 12}, {14, 16, 18}};
+    for (int i = 0; i < A->rows; ++i) {
+        for (int j = 0; j < A->cols; ++j) {
+            EXPECT_DOUBLE_EQ(ans[i][j], A->elements[i][j]);
+        }
+    }
+   
+    free_matrix(M);
+    free_matrix(N);
+    free_matrix(A);
+}
+
+TEST(matrix_add_matrix, error) {
+    Matrix* M = create_matrix(3, 4);
+    Matrix* N = create_matrix(3, 3);
+    Matrix* A = matrix_add_matrix(M, N);
+    EXPECT_EQ(nullptr, A);
+
+    free_matrix(M);
+    free_matrix(N);
+}
+
+TEST(matrix_sub_vector, success) {
+    Matrix* M = create_matrix(3, 3);
+    for (int i = 0; i < M->rows; ++i) {
+        for (int j = 0; j < M->cols; ++j) {
+            M->elements[i][j] = i * 3 + j + 1;
+        }
+    }
+
+    Vector* v = create_vector(3);
+    v->elements[0] = 1;
+    v->elements[1] = 10;
+    v->elements[2] = 100;
+
+    Matrix* N = matrix_sub_vector(M, v);
+    
+    EXPECT_NE(nullptr, N);
+    double ans[3][3] = {{0, -8, -97}, {3, -5, -94}, {6, -2, -91}};
+    for (int i = 0; i < N->rows; ++i) {
+        for (int j = 0; j < N->cols; ++j) {
+            EXPECT_DOUBLE_EQ(ans[i][j], N->elements[i][j]);
+        }
+    }
+
+    free_matrix(M);
+    free_vector(v);
+    free_matrix(N);
+}
+
+TEST(matrix_sub_vector, error) {
+    Matrix* M = create_matrix(3, 3);
+    Vector* v = create_vector(4);
+    Matrix* N = matrix_sub_vector(M, v);
+    EXPECT_EQ(nullptr, N);
+
+    free_matrix(M);
+    free_vector(v);
+}
+
+TEST(matrix_div_vector, success) {
+    Matrix* M = create_matrix(3, 3);
+    for (int i = 0; i < M->rows; ++i) {
+        for (int j = 0; j < M->cols; ++j) {
+            M->elements[i][j] = i * 3 + j + 1;
+        }
+    }
+
+    Vector* v = create_vector(3);
+    v->elements[0] = 1;
+    v->elements[1] = 10;
+    v->elements[2] = 100;
+
+    Matrix* N = matrix_div_vector(M, v);
+    
+    EXPECT_NE(nullptr, N);
+    double ans[3][3] = {{1, 0.2, 0.03}, {4, 0.5, 0.06}, {7, 0.8, 0.09}};
+    for (int i = 0; i < N->rows; ++i) {
+        for (int j = 0; j < N->cols; ++j) {
+            EXPECT_DOUBLE_EQ(ans[i][j], N->elements[i][j]);
+        }
+    }
+
+    free_matrix(M);
+    free_vector(v);
+    free_matrix(N);
+}
+
+TEST(matrix_div_vector, error) {
+    Matrix* M = create_matrix(3, 3);
+    Vector* v = create_vector(4);
+    Matrix* N = matrix_div_vector(M, v);
+    EXPECT_EQ(nullptr, N);
+
+    free_matrix(M);
+    free_vector(v);
+}
+
+TEST(vector_add_scalar, success) {
+    Vector* v = create_vector(3);
+    v->elements[0] = 1;
+    v->elements[1] = 10;
+    v->elements[2] = 100;
+
+    Vector* u = vector_add_scalar(v, 1000);
+    EXPECT_NE(nullptr, u);
+
+    double ans[3] = {1001, 1010, 1100};
+    for (int i = 0; i < 3; ++i) {
+        EXPECT_EQ(ans[i], u->elements[i]);
+    }
+
+    free_vector(v);
+    free_vector(u);
+}
+
+TEST(pow_matrix, success) {
+    Matrix* M = create_matrix(3, 3);
+    for (int i = 0; i < M->rows; ++i) {
+        for (int j = 0; j < M->cols; ++j) {
+            M->elements[i][j] = i * 3 + j + 1;
+        }
+    }
+
+    Matrix* N = pow_matrix(M, 2);
+    double ans[3][3] = {{1, 4, 9}, {16, 25, 36}, {49, 64, 81}};
+    for (int i = 0; i < N->rows; ++i) {
+        for (int j = 0; j < N->cols; ++j) {
+            EXPECT_DOUBLE_EQ(ans[i][j], N->elements[i][j]);
+        }
+    }
+
+    free_matrix(M);
+    free_matrix(N);
+}
+
+TEST(sqrt_vector, success) {
+    Vector* v = create_vector(3);
+    v->elements[0] = 1;
+    v->elements[1] = 4;
+    v->elements[2] = 9;
+
+    Vector* u = sqrt_vector(v);
+    double ans[3] = {1, 2, 3};
+    for (int i = 0; i < u->size; ++i) {
+        EXPECT_DOUBLE_EQ(ans[i], u->elements[i]);
+    }
+
+    free_vector(v);
+    free_vector(u);
+}
+
+TEST(create_image_batch, success) {
+    double** images = (double**)malloc(sizeof(double*) * 5);
+    for (int i = 0; i < 5; ++i) {
+        images[i] = (double*)malloc(sizeof(double) * NUM_OF_PIXELS);
+        for (int j = 0; j < NUM_OF_PIXELS; ++j) {
+            images[i][j] = (i + 1) * j; 
+        }
+    }
+    int batch_index[] = {2, 3, 4};
+
+    Matrix* M = create_image_batch(images,(const int*)batch_index, 3);
+    EXPECT_NE(nullptr, M);
+
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < NUM_OF_PIXELS; ++j) {
+            EXPECT_DOUBLE_EQ((i + 3) * j, M->elements[i][j]);
+        }
+    }
+
+    for (int i = 0; i < 5; ++i) {
+        free(images[i]);
+    }
+    free(images);
+    free_matrix(M);
+}
+
+TEST(create_image_batch_4d, success) {
+    double** images = (double**)malloc(sizeof(double*) * 5);
+    for (int i = 0; i < 5; ++i) {
+        images[i] = (double*)malloc(sizeof(double) * NUM_OF_PIXELS);
+        for (int j = 0; j < NUM_OF_PIXELS; ++j) {
+            images[i][j] = (i + 1) * j; 
+        }
+    }
+    int batch_index[] = {2, 3, 4};
+
+    Matrix4d* M = create_image_batch_4d(images,(const int*)batch_index, 3);
+    EXPECT_NE(nullptr, M);
+
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < NUM_OF_ROWS; ++j) {
+            for (int k = 0; k < NUM_OF_COLS; ++k) {
+                EXPECT_DOUBLE_EQ((i + 3) * (j * NUM_OF_ROWS + k), M->elements[i][0][j][k]);
+            }
+        }
+    }
+
+    for (int i = 0; i < 5; ++i) {
+        free(images[i]);
+    }
+    free(images);
+    free_matrix_4d(M);
 }
 
