@@ -56,10 +56,6 @@ Vector* vector_softmax(const Vector* v) {
         r->elements[i] = exp(v->elements[i] - max) / sum;
     }   
 
-    for (int i = 0; i < r->size; ++i) {
-        r->elements[i] = sigmoid(r->elements[i]);
-    }
-
     return r;
 }
 
