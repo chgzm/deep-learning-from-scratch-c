@@ -43,3 +43,22 @@ void EXPECT_MATRIX_EQ(const std::vector<std::vector<double>>& E, const Matrix* M
         }
     }
 }
+
+void EXPECT_VECTOR_NEAR(const std::vector<double>& e, const Vector* v) {
+    EXPECT_EQ(e.size(), v->size);
+
+    for (int i = 0; i < v->size; ++i) {
+        EXPECT_NEAR(e[i], v->elements[i], 10e-8);
+    }
+}
+
+void EXPECT_MATRIX_NEAR(const std::vector<std::vector<double>>& E, const Matrix* M) {
+    EXPECT_EQ(E.size(), M->rows);
+    EXPECT_EQ(E[0].size(), M->cols);
+
+    for (int i = 0; i < M->rows; ++i) {
+        for (int j = 0; j < M->cols; ++j) {
+            EXPECT_NEAR(E[i][j], M->elements[i][j], 10e-8);
+        }
+    }
+}
