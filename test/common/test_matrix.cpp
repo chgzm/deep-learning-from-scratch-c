@@ -5,6 +5,8 @@ extern "C" {
 #include <mnist.h>
 }
 
+#include "utest_util.h"
+
 // static const double EPS = 1e-10;
 
 TEST(create_vector, success) {
@@ -173,20 +175,12 @@ TEST(init_vector_from_array, success) {
 }
 
 TEST(add_vector, success) {
-    Vector* a = create_vector(3);
-    Vector* b = create_vector(3);
-
-    for (int i = 0; i < 3; ++i) {
-        a->elements[i] = b->elements[i] = i + 1;
-    }
+    Vector* a = create_vector_from_stdvec({1, 2, 3});
+    Vector* b = create_vector_from_stdvec({1, 2, 3});
 
     Vector* v = add_vector(a, b);
     EXPECT_NE(nullptr, v);
-
-    double ans[] = {2, 4, 6};
-    for (int i = 0; i < 3; ++i) {
-        EXPECT_DOUBLE_EQ(ans[i], v->elements[i]);
-    }
+    EXPECT_VECTOR_EQ({2, 4, 6}, v);
 
     free_vector(a);
     free_vector(b);
@@ -205,31 +199,16 @@ TEST(add_vector, error) {
 }
 
 TEST(dot_vector_matrix, success) {
-    Vector* v = create_vector(3);
-    for (int i = 0; i < v->size; ++i) {
-        v->elements[i] = i + 1;
-    }
-
-    Matrix* M = create_matrix(3, 3);
-    for (int i = 0; i < M->rows; ++i) {
-        for (int j = 0; j < M->cols; ++j) {
-            M->elements[i][j] = i * 3 + j + 1;
-        }
-    }
+    Vector* v = create_vector_from_stdvec({1, 2, 3});
+    Matrix* M = create_matrix_from_stdvec({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}});
 
     Vector* u = dot_vector_matrix(v, M);
-    EXPECT_EQ(3, u->size);
-
-    double ans[] = {30, 36, 42};
-    for (int i = 0; i < 3; ++i) {
-        EXPECT_DOUBLE_EQ(ans[i], u->elements[i]);
-    }
+    EXPECT_VECTOR_EQ({30, 36, 42}, u);
 
     free_vector(v);
     free_vector(u);
     free_matrix(M);
 }
-
 
 TEST(dot_vector_matrix, error) {
     Vector* v = create_vector(4);
@@ -242,30 +221,12 @@ TEST(dot_vector_matrix, error) {
 }
 
 TEST(dot_matrix, success) {
-    Matrix* M = create_matrix(2, 3);
-    for (int i = 0; i < M->rows; ++i) {
-        for (int j = 0; j < M->cols; ++j) {
-            M->elements[i][j] = i * 3 + j + 1;
-        }
-    }
-
-    Matrix* N = create_matrix(3, 4);
-    for (int i = 0; i < N->rows; ++i) {
-        for (int j = 0; j < N->cols; ++j) {
-            N->elements[i][j] = i * 4 + j + 1;
-        }
-    }
+    Matrix* M = create_matrix_from_stdvec({{1, 2, 3}, {4, 5, 6}});
+    Matrix* N = create_matrix_from_stdvec({{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}});
 
     Matrix* P = dot_matrix(M, N);
     EXPECT_NE(nullptr, P);
-
-    double ans[2][4] = {{38, 44, 50, 56}, {83, 98, 113, 128}};
-
-    for (int i = 0; i < P->rows; ++i) {
-        for (int j = 0; j < P->cols; ++j) {
-            EXPECT_DOUBLE_EQ(ans[i][j], P->elements[i][j]);
-        }
-    }
+    EXPECT_MATRIX_EQ({{38, 44, 50, 56}, {83, 98, 113, 128}}, P);
 
     free_matrix(M);
     free_matrix(N);
@@ -283,27 +244,12 @@ TEST(dot_matrix, error) {
 }
 
 TEST(product_vector_matrix, success) {
-    Vector* v = create_vector(3);
-    for (int i = 0; i < v->size; ++i) {
-        v->elements[i] = i + 1;
-    }
-
-    Matrix* M = create_matrix(3, 3);
-    for (int i = 0; i < M->rows; ++i) {
-        for (int j = 0; j < M->cols; ++j) {
-            M->elements[i][j] = i * 3 + j + 1;
-        }
-    }
+    Vector* v = create_vector_from_stdvec({1, 2, 3});
+    Matrix* M = create_matrix_from_stdvec({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}});
 
     Matrix* N = product_vector_matrix(v, M);
     EXPECT_NE(nullptr, N);
-
-    double ans[3][3] = {{1, 4, 9}, {4, 10, 18}, {7, 16, 27}};
-    for (int i = 0; i < N->rows; ++i) {
-        for (int j = 0; j < N->cols; ++j) {
-            EXPECT_DOUBLE_EQ(ans[i][j], N->elements[i][j]);
-        }
-    }
+    EXPECT_MATRIX_EQ({{1, 4, 9}, {4, 10, 18}, {7, 16, 27}}, N);
 
     free_vector(v);
     free_matrix(M);
@@ -321,29 +267,12 @@ TEST(product_vector_matrix, error) {
 }
 
 TEST(product_matrix, success) {
-    Matrix* M = create_matrix(3, 4);
-    for (int i = 0; i < M->rows; ++i) {
-        for (int j = 0; j < M->cols; ++j) {
-            M->elements[i][j] = i * 4 + j + 1;
-        }
-    }
-
-    Matrix* N = create_matrix(3, 4);
-    for (int i = 0; i < N->rows; ++i) {
-        for (int j = 0; j < N->cols; ++j) {
-            N->elements[i][j] = i * 4 + j + 1;
-        }
-    }
+    Matrix* M = create_matrix_from_stdvec({{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}});
+    Matrix* N = create_matrix_from_stdvec({{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}});
 
     Matrix* A = product_matrix(M, N);
     EXPECT_NE(nullptr, N);
-
-    double ans[3][4] = {{1, 4, 9, 16}, {25, 36, 49, 64}, {81, 100, 121, 144}};
-    for (int i = 0; i < A->rows; ++i) {
-        for (int j = 0; j < A->cols; ++j) {
-            EXPECT_DOUBLE_EQ(ans[i][j], A->elements[i][j]);
-        }
-    }
+    EXPECT_MATRIX_EQ({{1, 4, 9, 16}, {25, 36, 49, 64}, {81, 100, 121, 144}}, A);
 
     free_matrix(M);
     free_matrix(N);
@@ -362,23 +291,12 @@ TEST(product_matrix, error) {
 }
 
 TEST(product_vector, success) {
-    Vector* v = create_vector(3);
-    for (int i = 0; i < v->size; ++i) {
-        v->elements[i] = i + 1;
-    }
-
-    Vector* u = create_vector(3);
-    for (int i = 0; i < u->size; ++i) {
-        u->elements[i] = i + 1;
-    }
+    Vector* v = create_vector_from_stdvec({1, 2, 3});
+    Vector* u = create_vector_from_stdvec({1, 2, 3});
 
     Vector* w = product_vector(v, u);
     EXPECT_NE(nullptr, w);
-
-    double ans[3] = {1, 4, 9};
-    for (int i = 0; i < 3; ++i) {
-        EXPECT_DOUBLE_EQ(ans[i], w->elements[i]);
-    }
+    EXPECT_VECTOR_EQ({1, 4, 9}, w);
 
     free_vector(v);
     free_vector(u);
@@ -397,104 +315,56 @@ TEST(product_vector, error) {
 }
 
 TEST(matrix_col_mean, success) {
-    Matrix* M = create_matrix(3, 4);
-    for (int i = 0; i < M->rows; ++i) {
-        for (int j = 0; j < M->cols; ++j) {
-            M->elements[i][j] = i * 4 + j + 1;
-        }
-    }
+    Matrix* M = create_matrix_from_stdvec({{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}});
 
     Vector* v = matrix_col_mean(M);
-    double ans[4] = {5, 6, 7, 8};
-    
-    for (int i = 0; i < 4; ++i) {
-        EXPECT_DOUBLE_EQ(ans[i], v->elements[i]);
-    }
+   
+    EXPECT_VECTOR_EQ({5, 6, 7, 8}, v);
 
     free_matrix(M);
     free_vector(v);
 }
 
 TEST(matrix_col_sum, success) {
-    Matrix* M = create_matrix(3, 4);
-    for (int i = 0; i < M->rows; ++i) {
-        for (int j = 0; j < M->cols; ++j) {
-            M->elements[i][j] = i * 4 + j + 1;
-        }
-    }
-
-    Vector* v = matrix_col_sum(M);
-    double ans[4] = {15, 18, 21, 24};
+    Matrix* M = create_matrix_from_stdvec({{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}});
     
-    for (int i = 0; i < 4; ++i) {
-        EXPECT_DOUBLE_EQ(ans[i], v->elements[i]);
-    }
+    Vector* v = matrix_col_sum(M);
+    EXPECT_VECTOR_EQ({15, 18, 21, 24}, v);
 
     free_matrix(M);
     free_vector(v);
 }
 
 TEST(scalar_matrix, success) {
-    Matrix* M = create_matrix(3, 3);
-    for (int i = 0; i < M->rows; ++i) {
-        for (int j = 0; j < M->cols; ++j) {
-            M->elements[i][j] = i * 3 + j + 1;
-        }
-    }
+    Matrix* M = create_matrix_from_stdvec({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}});
 
     scalar_matrix(M, 3);
-    double ans[3][3] = {{3, 6, 9}, {12, 15, 18}, {21, 24, 27}};
-    for (int i = 0; i < M->rows; ++i) {
-        for (int j = 0; j < M->cols; ++j) {
-            EXPECT_DOUBLE_EQ(ans[i][j], M->elements[i][j]);
-        }
-    }
+    EXPECT_MATRIX_EQ({{3, 6, 9}, {12, 15, 18}, {21, 24, 27}}, M);
 
     free_matrix(M);
 }
 
 TEST(scalar_vector, success) {
-    Vector* v = create_vector(3);
-    for (int i = 0; i < v->size; ++i) {
-        v->elements[i] = i + 1;
-    }
+    Vector* v = create_vector_from_stdvec({1, 2, 3});
 
     scalar_vector(v, 3);
-    double ans[3] = {3, 6, 9}; for (int i = 0; i < v->size; ++i) {
-        EXPECT_DOUBLE_EQ(ans[i], v->elements[i]);
-    }
+    EXPECT_VECTOR_EQ({3, 6, 9}, v);
 
     free_vector(v);
 }
 
 TEST(transpose, success) {
-    Matrix* M = create_matrix(3, 3);
-    for (int i = 0; i < M->rows; ++i) {
-        for (int j = 0; j < M->cols; ++j) {
-            M->elements[i][j] = i * 3 + j + 1;
-        }
-    }
+    Matrix* M = create_matrix_from_stdvec({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}});
 
     Matrix* M_T = transpose(M);
-
-    double ans[3][3] = {{1, 4, 7}, {2, 5, 8}, {3, 6, 9}};
-    for (int i = 0; i < M_T->rows; ++i) {
-        for (int j = 0; j < M_T->cols; ++j) {
-            EXPECT_DOUBLE_EQ(ans[i][j], M_T->elements[i][j]);
-        }
-    }
+    EXPECT_MATRIX_EQ({{1, 4, 7}, {2, 5, 8}, {3, 6, 9}}, M_T);
 
     free_matrix(M);
     free_matrix(M_T);
 }
 
 TEST(matrix_sum, success) {
-    Matrix* M = create_matrix(3, 3);
-    for (int i = 0; i < M->rows; ++i) {
-        for (int j = 0; j < M->cols; ++j) {
-            M->elements[i][j] = i * 3 + j + 1;
-        }
-    }
+    Matrix* M = create_matrix_from_stdvec({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}});
 
     const double sum =  matrix_sum(M);
     EXPECT_DOUBLE_EQ(sum, 45);
@@ -503,23 +373,12 @@ TEST(matrix_sum, success) {
 }
 
 TEST(vector_div_vector, success) {
-    Vector* v = create_vector(3);
-    for (int i = 0; i < 3; ++i) {
-        v->elements[i] = (i + 1) * 5;
-    }
-
-    Vector* u = create_vector(3);
-    for (int i = 0; i < 3; ++i) {
-        u->elements[i] = 5;
-    }
+    Vector* v = create_vector_from_stdvec({5, 10, 15});
+    Vector* u = create_vector_from_stdvec({5, 5, 5});
     
     Vector* w = vector_div_vector(v, u);
     EXPECT_NE(nullptr, w);
-
-    double ans[3] = {1, 2, 3};
-    for (int i = 0; i < w->size; ++i) {
-        EXPECT_DOUBLE_EQ(ans[i], w->elements[i]);
-    }
+    EXPECT_VECTOR_EQ({1, 2, 3}, w);
 
     free_vector(v);
     free_vector(u);
@@ -537,28 +396,12 @@ TEST(vector_div_vector, error) {
 }
 
 TEST(matrix_add_vector, success) {
-    Matrix* M = create_matrix(3, 3);
-    for (int i = 0; i < M->rows; ++i) {
-        for (int j = 0; j < M->cols; ++j) {
-            M->elements[i][j] = i * 3 + j + 1;
-        }
-    }
-
-    Vector* v = create_vector(3);
-    v->elements[0] = 1;
-    v->elements[1] = 10;
-    v->elements[2] = 100;
+    Matrix* M = create_matrix_from_stdvec({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}});
+    Vector* v = create_vector_from_stdvec({1, 10, 100});
 
     Matrix* N = matrix_add_vector(M, v);
-    
     EXPECT_NE(nullptr, N);
-
-    double ans[3][3] = {{2, 12, 103}, {5, 15, 106}, {8, 18, 109}};
-    for (int i = 0; i < N->rows; ++i) {
-        for (int j = 0; j < N->cols; ++j) {
-            EXPECT_DOUBLE_EQ(ans[i][j], N->elements[i][j]);
-        }
-    }
+    EXPECT_MATRIX_EQ({{2, 12, 103}, {5, 15, 106}, {8, 18, 109}}, N);
 
     free_matrix(M);
     free_vector(v);
@@ -576,29 +419,13 @@ TEST(matrix_add_vector, error) {
 }
 
 TEST(matrix_add_matrix, success) {
-    Matrix* M = create_matrix(3, 3);
-    for (int i = 0; i < M->rows; ++i) {
-        for (int j = 0; j < M->cols; ++j) {
-            M->elements[i][j] = i * 3 + j + 1;
-        }
-    }
-
-    Matrix* N = create_matrix(3, 3);
-    for (int i = 0; i < N->rows; ++i) {
-        for (int j = 0; j < N->cols; ++j) {
-            N->elements[i][j] = i * 3 + j + 1;
-        }
-    }
+    Matrix* M = create_matrix_from_stdvec({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}});
+    Matrix* N = create_matrix_from_stdvec({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}});
 
     Matrix* A = matrix_add_matrix(M, N);
     EXPECT_NE(nullptr, A);
 
-    double ans[3][3] = {{2, 4, 6}, {8, 10, 12}, {14, 16, 18}};
-    for (int i = 0; i < A->rows; ++i) {
-        for (int j = 0; j < A->cols; ++j) {
-            EXPECT_DOUBLE_EQ(ans[i][j], A->elements[i][j]);
-        }
-    }
+    EXPECT_MATRIX_EQ({{2, 4, 6}, {8, 10, 12}, {14, 16, 18}}, A);
    
     free_matrix(M);
     free_matrix(N);
@@ -616,27 +443,13 @@ TEST(matrix_add_matrix, error) {
 }
 
 TEST(matrix_sub_vector, success) {
-    Matrix* M = create_matrix(3, 3);
-    for (int i = 0; i < M->rows; ++i) {
-        for (int j = 0; j < M->cols; ++j) {
-            M->elements[i][j] = i * 3 + j + 1;
-        }
-    }
-
-    Vector* v = create_vector(3);
-    v->elements[0] = 1;
-    v->elements[1] = 10;
-    v->elements[2] = 100;
+    Matrix* M = create_matrix_from_stdvec({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}});
+    Vector* v = create_vector_from_stdvec({1, 10, 100});
 
     Matrix* N = matrix_sub_vector(M, v);
-    
     EXPECT_NE(nullptr, N);
-    double ans[3][3] = {{0, -8, -97}, {3, -5, -94}, {6, -2, -91}};
-    for (int i = 0; i < N->rows; ++i) {
-        for (int j = 0; j < N->cols; ++j) {
-            EXPECT_DOUBLE_EQ(ans[i][j], N->elements[i][j]);
-        }
-    }
+
+    EXPECT_MATRIX_EQ({{0, -8, -97}, {3, -5, -94}, {6, -2, -91}}, N);
 
     free_matrix(M);
     free_vector(v);
@@ -654,27 +467,13 @@ TEST(matrix_sub_vector, error) {
 }
 
 TEST(matrix_div_vector, success) {
-    Matrix* M = create_matrix(3, 3);
-    for (int i = 0; i < M->rows; ++i) {
-        for (int j = 0; j < M->cols; ++j) {
-            M->elements[i][j] = i * 3 + j + 1;
-        }
-    }
-
-    Vector* v = create_vector(3);
-    v->elements[0] = 1;
-    v->elements[1] = 10;
-    v->elements[2] = 100;
+    Matrix* M = create_matrix_from_stdvec({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}});
+    Vector* v = create_vector_from_stdvec({1, 10, 100});
 
     Matrix* N = matrix_div_vector(M, v);
-    
     EXPECT_NE(nullptr, N);
-    double ans[3][3] = {{1, 0.2, 0.03}, {4, 0.5, 0.06}, {7, 0.8, 0.09}};
-    for (int i = 0; i < N->rows; ++i) {
-        for (int j = 0; j < N->cols; ++j) {
-            EXPECT_DOUBLE_EQ(ans[i][j], N->elements[i][j]);
-        }
-    }
+
+    EXPECT_MATRIX_EQ({{1, 0.2, 0.03}, {4, 0.5, 0.06}, {7, 0.8, 0.09}}, N);
 
     free_matrix(M);
     free_vector(v);
@@ -692,54 +491,33 @@ TEST(matrix_div_vector, error) {
 }
 
 TEST(vector_add_scalar, success) {
-    Vector* v = create_vector(3);
-    v->elements[0] = 1;
-    v->elements[1] = 10;
-    v->elements[2] = 100;
+    Vector* v = create_vector_from_stdvec({1, 10, 100});
 
     Vector* u = vector_add_scalar(v, 1000);
     EXPECT_NE(nullptr, u);
 
-    double ans[3] = {1001, 1010, 1100};
-    for (int i = 0; i < 3; ++i) {
-        EXPECT_EQ(ans[i], u->elements[i]);
-    }
+    EXPECT_VECTOR_EQ({1001, 1010, 1100}, u);
 
     free_vector(v);
     free_vector(u);
 }
 
 TEST(pow_matrix, success) {
-    Matrix* M = create_matrix(3, 3);
-    for (int i = 0; i < M->rows; ++i) {
-        for (int j = 0; j < M->cols; ++j) {
-            M->elements[i][j] = i * 3 + j + 1;
-        }
-    }
+    Matrix* M = create_matrix_from_stdvec({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}});
 
     Matrix* N = pow_matrix(M, 2);
-    double ans[3][3] = {{1, 4, 9}, {16, 25, 36}, {49, 64, 81}};
-    for (int i = 0; i < N->rows; ++i) {
-        for (int j = 0; j < N->cols; ++j) {
-            EXPECT_DOUBLE_EQ(ans[i][j], N->elements[i][j]);
-        }
-    }
+    EXPECT_MATRIX_EQ({{1, 4, 9}, {16, 25, 36}, {49, 64, 81}}, N);
 
     free_matrix(M);
     free_matrix(N);
 }
 
 TEST(sqrt_vector, success) {
-    Vector* v = create_vector(3);
-    v->elements[0] = 1;
-    v->elements[1] = 4;
-    v->elements[2] = 9;
+    Vector* v = create_vector_from_stdvec({1, 4, 9});
 
     Vector* u = sqrt_vector(v);
-    double ans[3] = {1, 2, 3};
-    for (int i = 0; i < u->size; ++i) {
-        EXPECT_DOUBLE_EQ(ans[i], u->elements[i]);
-    }
+
+    EXPECT_VECTOR_EQ({1, 2, 3}, u);
 
     free_vector(v);
     free_vector(u);
@@ -798,4 +576,3 @@ TEST(create_image_batch_4d, success) {
     free(images);
     free_matrix_4d(M);
 }
-
