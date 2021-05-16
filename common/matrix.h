@@ -79,6 +79,9 @@ Matrix* _scalar_matrix(const Matrix* M, double k);
 void scalar_matrix(Matrix* M, double k);
 void scalar_vector(Vector* V, double k);
 
+Matrix* im2col(const Matrix4d* M, int filter_h, int filter_w, int stride, int pad);
+Matrix4d* col2im(const Matrix* M, int* sizes, int filter_h, int filter_w, int stride, int pad);
+
 //
 // create batch
 //
@@ -93,5 +96,6 @@ Vector* create_label_batch(uint8_t* labels, const int* batch_index, int size);
 
 void print_vector(const Vector* v);
 void print_matrix(const Matrix* M);
+void print_matrix_4d(const Matrix4d* M);
 
 #endif

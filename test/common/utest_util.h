@@ -8,9 +8,11 @@ extern "C" {
 
 Vector* create_vector_from_stdvec(const std::vector<double>& vec);
 Matrix* create_matrix_from_stdvec(const std::vector<std::vector<double>>& vec);
+Matrix4d* create_matrix4d_from_stdvec(const std::vector<std::vector<std::vector<std::vector<double>>>>& vec);
 
 void EXPECT_VECTOR_EQ(const std::vector<double>& e, const Vector* v);
 void EXPECT_MATRIX_EQ(const std::vector<std::vector<double>>& E, const Matrix* M);
+void EXPECT_MATRIX4D_EQ(const std::vector<std::vector<std::vector<std::vector<double>>>>& E, const Matrix4d* M);
 
 void EXPECT_VECTOR_NEAR(const std::vector<double>& e, const Vector* v);
 void EXPECT_MATRIX_NEAR(const std::vector<std::vector<double>>& E, const Matrix* M);

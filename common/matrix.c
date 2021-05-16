@@ -469,6 +469,89 @@ Vector* sqrt_vector(const Vector* V) {
     return r;
 }
 
+Matrix* im2col(const Matrix4d* M, int filter_h, int filter_w, int stride, int pad) {
+    const int N = M->sizes[0];
+    const int C = M->sizes[1]; 
+    const int H = M->sizes[2];
+    const int W = M->sizes[3];
+
+    const int out_h = (H + 2 * pad - filter_h) / stride + 1; 
+    const int out_w = (W + 2 * pad - filter_w) / stride + 1; 
+
+    Matrix* R = create_matrix(N * out_h * out_w, filter_h * filter_w * C);
+
+    int rpos = 0, cpos = 0; 
+    for (int i = 0; i < N; ++i) {
+        for (int k = 0; k < out_h; ++k) {
+            for (int l = 0; l < out_w; ++l) {
+                for (int j = 0; j < C; ++j) {
+                    for (int m = k; m < k + filter_w; ++m) {
+                        for (int n = l; n < l + filter_h; ++n) {
+                            R->elements[rpos][cpos] = M->elements[i][j][m][n]; 
+                            ++cpos;
+                            if (cpos == R->cols) {
+                                cpos = 0;
+                                ++rpos;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return R;
+}
+
+Matrix4d* col2im(const Matrix* M, int* sizes, int filter_h, int filter_w, int stride, int pad) {
+    const int N = sizes[0];
+    const int C = sizes[1]; 
+    const int H = sizes[2];
+    const int W = sizes[3];
+
+    const int out_h = (H + 2 * pad - filter_h) / stride + 1; 
+    const int out_w = (W + 2 * pad - filter_w) / stride + 1; 
+
+    Matrix4d* R = create_matrix_4d(N, C, H, W);
+
+    int n = 0, c = 0, h = 0, w = 0;
+    for (int i = 0; i < M->rows; ++i) {
+        for (int j = 0; j < M->cols; j += (filter_h * filter_w)) {
+            double* buf = (double*)malloc(sizeof(double) * (filter_h * filter_w));
+            for (int k = j; k < j + (filter_h * filter_w); ++k) {
+                buf[k-j] = M->elements[i][k];
+            }
+
+            int idx = 0;
+            for (int k = h; k < h + filter_h; ++k) {
+                for (int l = w; l < w + filter_w; ++l) {
+                    R->elements[n][c][k][l] += buf[idx++];
+                }
+            }
+
+            ++c;
+            if (c == C) {
+                c = 0;
+                ++w;
+            }
+
+            if (w == out_w) {
+                w = 0;
+                ++h;
+            }
+
+            if (h == out_h) {
+                h = 0;
+                ++n;
+            }
+
+            free(buf);
+        }
+    }
+
+    return R;
+}
+
 //
 // create batch
 //
@@ -524,6 +607,26 @@ void print_matrix(const Matrix* M) {
         printf("[");
         for (int j = 0; j < M->cols; ++j) {
             printf("%lf ", M->elements[i][j]);
+        }
+        printf("]\n");
+    }
+    printf("]\n");
+}
+
+void print_matrix_4d(const Matrix4d* M) {
+    printf("sizes = (%d,%d,%d,%d)\n", M->sizes[0], M->sizes[1], M->sizes[2], M->sizes[3]);
+    for (int i = 0; i < M->sizes[0]; ++i) {
+        printf("[\n");
+        for (int j = 0; j < M->sizes[1]; ++j) {
+            printf("    [\n");
+            for (int k = 0; k < M->sizes[2]; ++k) {
+                printf("        [");
+                for (int l = 0; l < M->sizes[3]; ++l) {
+                    printf("%lf ", M->elements[i][j][k][l]);
+                }
+                printf("]\n");
+            }
+            printf("    ]\n");
         }
         printf("]\n");
     }
