@@ -63,6 +63,9 @@ Matrix* product_vector_matrix(const Vector* V, const Matrix* M);
 Matrix* product_matrix(const Matrix* M, const Matrix* N);
 Vector* product_vector(const Vector* V, const Vector* U);
 Matrix* transpose(const Matrix* M);
+Matrix4d* matrix_4d_transpose(const Matrix4d* M, int n1, int n2, int n3, int n4);
+Matrix* matrix_reshape_to_2d(const Matrix4d* M, int rows, int cols);
+Matrix4d* matrix_reshape_to_4d(const Matrix* M, int s1, int s2, int s3, int s4);
 
 double matrix_sum(const Matrix* M);
 Vector* matrix_col_mean(const Matrix* M);

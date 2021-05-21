@@ -352,6 +352,91 @@ Matrix* transpose(const Matrix* M) {
     return N;
 }
 
+Matrix4d* matrix_4d_transpose(const Matrix4d* M, int n1, int n2, int n3, int n4) {
+    Matrix4d* R = create_matrix_4d(M->sizes[n1], M->sizes[n2], M->sizes[n3], M->sizes[n4]);
+
+    int idx[4] = {0};
+    int n[4] = {n1, n2, n3, n4};
+    for (int i = 0; i < M->sizes[0]; ++i) {
+        for (int j = 0; j < M->sizes[1]; ++j) {
+            for (int k = 0; k < M->sizes[2]; ++k) {
+                for (int l = 0; l < M->sizes[3]; ++l) {
+                    const int org[] = {i, j, k, l};
+                    for (int i = 0; i < 4; ++i) {
+                        idx[i] = org[n[i]];
+                    }
+
+                    R->elements[idx[0]][idx[1]][idx[2]][idx[3]] = M->elements[i][j][k][l]; 
+                }
+            }
+        }
+    }
+
+    return R;
+}
+
+Matrix* matrix_reshape_to_2d(const Matrix4d* M, int rows, int cols) {
+    int r = rows;
+    int c = cols;
+    if (rows < 0) {
+        r = M->sizes[0] * M->sizes[1] * M->sizes[2] * M->sizes[3] / cols;
+    } else if (cols < 0) {
+        c = M->sizes[0] * M->sizes[1] * M->sizes[2] * M->sizes[3] / rows;
+    }
+
+    Matrix* R = create_matrix(r, c);
+    int r_pos = 0, c_pos = 0;
+    for (int i = 0; i < M->sizes[0]; ++i) {
+        for (int j = 0; j < M->sizes[1]; ++j) {
+            for (int k = 0; k < M->sizes[2]; ++k) {
+                for (int l = 0; l < M->sizes[3]; ++l) {
+                    R->elements[r_pos][c_pos++] = M->elements[i][j][k][l];
+                    if (c_pos == c) {
+                        c_pos = 0;
+                        ++r_pos;
+                    }
+                }
+            }
+        }
+    }
+
+    return R;
+}
+
+Matrix4d* matrix_reshape_to_4d(const Matrix* M, int s1, int s2, int s3, int s4) {
+    Matrix4d* R = create_matrix_4d(s1, s2, s3, s4);
+    
+    int sizes[] = {s1, s2, s3, s4};
+    if (s4 < 0) {
+        sizes[3] = M->rows * M->cols / (s1 * s2 * s3);
+    }
+
+    int p1 = 0, p2 = 0, p3 = 0, p4 = 0;
+    for (int i = 0; i < M->rows; ++i) {
+        for (int j = 0; j < M->cols; ++j) {
+            R->elements[p1][p2][p3][p4] = M->elements[i][j];
+            ++p4;
+            if (p4 == sizes[3]) {
+                p4 = 0;
+                ++p3;
+            }
+
+            if (p3 == sizes[2]) {
+                p3 = 0;
+                ++p2;
+            }
+
+            if (p2 == sizes[1]) {
+                p2 = 0;
+                ++p1;
+            } 
+        }
+    }
+
+    return R;
+}
+
+
 double matrix_sum(const Matrix* M) {
     double sum = 0.0;
     for (int i = 0; i < M->rows; ++i) {

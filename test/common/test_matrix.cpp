@@ -363,6 +363,182 @@ TEST(transpose, success) {
     free_matrix(M_T);
 }
 
+TEST(matrix_4d_transpose, success) {
+     Matrix4d* M = create_matrix4d_from_stdvec({
+       {
+            {{1,   2}, {3,   4}}, 
+            {{5,   6}, {7,   8}},
+            {{9,  10}, {11, 12}},
+            {{13, 14}, {15, 16}}
+       }, 
+       {
+            {{1,   2}, {3,   4}}, 
+            {{5,   6}, {7,   8}},
+            {{9,  10}, {11, 12}},
+            {{13, 14}, {15, 16}}
+       }
+    });
+
+    Matrix4d* MT = matrix_4d_transpose(M, 0, 3, 1, 2);   
+
+    std::vector<std::vector<std::vector<std::vector<double>>>> ans = {  
+        {
+            {
+                { 1,  3},
+                { 5,  7},
+                { 9, 11},
+                {13, 15}
+            },
+
+            {
+                { 2,  4},
+                { 6,  8},
+                {10, 12},
+                {14, 16}
+            }
+        },
+
+        {
+            {
+                { 1,  3},
+                { 5,  7},
+                { 9, 11},
+                {13, 15}
+            },
+
+            {
+                { 2,  4},
+                { 6,  8},
+                {10, 12},
+                {14, 16}
+            }
+        }
+    };
+
+    EXPECT_MATRIX4D_EQ(ans, MT);
+
+    free_matrix_4d(M);
+    free_matrix_4d(MT);
+}
+
+TEST(matrix_4d_transpose, success2) {
+     Matrix4d* M = create_matrix4d_from_stdvec({
+       {
+            {{1,   2}, {3,   4}}, 
+            {{5,   6}, {7,   8}},
+            {{9,  10}, {11, 12}},
+            {{13, 14}, {15, 16}}
+       }, 
+       {
+            {{1,   2}, {3,   4}}, 
+            {{5,   6}, {7,   8}},
+            {{9,  10}, {11, 12}},
+            {{13, 14}, {15, 16}}
+       }
+    });
+
+    Matrix4d* MT = matrix_4d_transpose(M, 0, 3, 2, 1);   
+
+    std::vector<std::vector<std::vector<std::vector<double>>>> ans = {  
+        {
+            {
+                {1, 5,  9, 13},
+                {3, 7, 11, 15}
+            },
+            {
+                {2, 6, 10, 14},
+                {4, 8, 12, 16}
+            }
+        },
+        {
+            {
+                {1, 5,  9, 13},
+                {3, 7, 11, 15}
+            },
+            {
+                {2, 6, 10, 14},
+                {4, 8, 12, 16}
+            }
+        }
+    };
+
+    EXPECT_MATRIX4D_EQ(ans, MT);
+
+    free_matrix_4d(M);
+    free_matrix_4d(MT);
+}
+
+TEST(matrix_reshape_to_2d, success) {
+    Matrix4d* M = create_matrix4d_from_stdvec({
+       {
+            {{1,   2}, {3,   4}}, 
+            {{5,   6}, {7,   8}},
+            {{9,  10}, {11, 12}},
+            {{13, 14}, {15, 16}}
+       }, 
+       {
+            {{1,   2}, {3,   4}}, 
+            {{5,   6}, {7,   8}},
+            {{9,  10}, {11, 12}},
+            {{13, 14}, {15, 16}}
+       }
+    });
+
+    Matrix* N = matrix_reshape_to_2d(M, 8, 4);
+
+    std::vector<std::vector<double>> ans = {
+        { 1,  2,  3,  4},
+        { 5,  6,  7,  8},
+        { 9, 10, 11, 12},
+        {13, 14, 15, 16},
+        { 1,  2,  3,  4},
+        { 5,  6,  7,  8},
+        { 9, 10, 11, 12},
+        {13, 14, 15, 16},
+    };
+
+    EXPECT_MATRIX_EQ(ans, N);
+
+    free_matrix_4d(M);
+    free_matrix(N);
+}
+
+TEST(matrix_reshape_to_4d, success) {
+    Matrix* M = create_matrix_from_stdvec(
+    {
+        { 1,  2,  3,  4},
+        { 5,  6,  7,  8},
+        { 9, 10, 11, 12},
+        {13, 14, 15, 16},
+        { 1,  2,  3,  4},
+        { 5,  6,  7,  8},
+        { 9, 10, 11, 12},
+        {13, 14, 15, 16},
+    });
+
+    Matrix4d* N = matrix_reshape_to_4d(M, 2, 4, 2, 2);
+
+    std::vector<std::vector<std::vector<std::vector<double>>>> ans = {  
+       {
+            {{1,   2}, {3,   4}}, 
+            {{5,   6}, {7,   8}},
+            {{9,  10}, {11, 12}},
+            {{13, 14}, {15, 16}}
+       }, 
+       {
+            {{1,   2}, {3,   4}}, 
+            {{5,   6}, {7,   8}},
+            {{9,  10}, {11, 12}},
+            {{13, 14}, {15, 16}}
+       }
+    };
+
+    EXPECT_MATRIX4D_EQ(ans, N);
+
+    free_matrix(M);
+    free_matrix_4d(N);
+}
+
 TEST(matrix_sum, success) {
     Matrix* M = create_matrix_from_stdvec({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}});
 
