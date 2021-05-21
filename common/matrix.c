@@ -566,8 +566,8 @@ Matrix* im2col(const Matrix4d* M, int filter_h, int filter_w, int stride, int pa
 
     int rpos = 0, cpos = 0; 
     for (int i = 0; i < N; ++i) {
-        for (int k = 0; k < out_h; ++k) {
-            for (int l = 0; l < out_w; ++l) {
+        for (int k = 0; k < out_h; k += stride) {
+            for (int l = 0; l < out_w; l += stride) {
                 for (int j = 0; j < C; ++j) {
                     for (int m = k; m < k + filter_w; ++m) {
                         for (int n = l; n < l + filter_h; ++n) {
