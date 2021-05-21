@@ -562,16 +562,18 @@ Matrix* im2col(const Matrix4d* M, int filter_h, int filter_w, int stride, int pa
     const int out_h = (H + 2 * pad - filter_h) / stride + 1; 
     const int out_w = (W + 2 * pad - filter_w) / stride + 1; 
 
+    Matrix4d* A = matrix_4d_pad(M, pad);  
+
     Matrix* R = create_matrix(N * out_h * out_w, filter_h * filter_w * C);
 
     int rpos = 0, cpos = 0; 
     for (int i = 0; i < N; ++i) {
-        for (int k = 0; k < out_h; k += stride) {
-            for (int l = 0; l < out_w; l += stride) {
+        for (int k = 0; k < out_h * stride; k += stride) {
+            for (int l = 0; l < out_w * stride; l += stride) {
                 for (int j = 0; j < C; ++j) {
                     for (int m = k; m < k + filter_w; ++m) {
                         for (int n = l; n < l + filter_h; ++n) {
-                            R->elements[rpos][cpos] = M->elements[i][j][m][n]; 
+                            R->elements[rpos][cpos] = A->elements[i][j][m][n]; 
                             ++cpos;
                             if (cpos == R->cols) {
                                 cpos = 0;
@@ -584,6 +586,8 @@ Matrix* im2col(const Matrix4d* M, int filter_h, int filter_w, int stride, int pa
         }
     }
 
+    free_matrix_4d(A);
+
     return R;
 }
 
@@ -595,8 +599,9 @@ Matrix4d* col2im(const Matrix* M, int* sizes, int filter_h, int filter_w, int st
 
     const int out_h = (H + 2 * pad - filter_h) / stride + 1; 
     const int out_w = (W + 2 * pad - filter_w) / stride + 1; 
+    Matrix4d* B = create_matrix_4d(N, C, H + 2 * pad + stride - 1, W + 2 * pad + stride - 1);
 
-    Matrix4d* R = create_matrix_4d(N, C, H, W);
+    // Matrix4d* R = create_matrix_4d(N, C, H, W);
 
     int n = 0, c = 0, h = 0, w = 0;
     for (int i = 0; i < M->rows; ++i) {
@@ -609,22 +614,22 @@ Matrix4d* col2im(const Matrix* M, int* sizes, int filter_h, int filter_w, int st
             int idx = 0;
             for (int k = h; k < h + filter_h; ++k) {
                 for (int l = w; l < w + filter_w; ++l) {
-                    R->elements[n][c][k][l] += buf[idx++];
+                    B->elements[n][c][k][l] += buf[idx++];
                 }
             }
 
             ++c;
             if (c == C) {
                 c = 0;
-                ++w;
+                w += stride;
             }
 
-            if (w == out_w) {
+            if (w >= (out_w * stride)) {
                 w = 0;
-                ++h;
+                h += stride;
             }
 
-            if (h == out_h) {
+            if (h >= (out_h * stride)) {
                 h = 0;
                 ++n;
             }
@@ -632,7 +637,24 @@ Matrix4d* col2im(const Matrix* M, int* sizes, int filter_h, int filter_w, int st
             free(buf);
         }
     }
+    
+    Matrix4d* R = create_matrix_4d(N, C, H, W);
+    for (int i = 0; i < B->sizes[0]; ++i) {
+        for (int j = 0; j < B->sizes[1]; ++j) {
+            for (int k = 0; k < B->sizes[2]; ++k) {
+                for (int l = 0; l < B->sizes[3]; ++l) {
+                    if ((k < pad) || ((R->sizes[2] + pad) <= k) || (l < pad) || ((R->sizes[3] + pad) <= l)) {
+                        continue;
+                    } 
 
+                    R->elements[i][j][k - pad][l - pad] = B->elements[i][j][k][l];
+                }
+            }
+        }
+    }
+
+    free_matrix_4d(B);
+    
     return R;
 }
 
