@@ -99,3 +99,88 @@ TEST(dropout_forward_backward, success) {
     free_matrix(N);
 }
 
+TEST(convolution_forward_backward, success) {
+    Matrix4d* M = create_matrix4d_from_stdvec({
+        {
+            {{1,   2}, {3,   4}}, 
+            {{5,   6}, {7,   8}},
+            {{9,  10}, {11, 12}},
+            {{13, 14}, {15, 16}}
+        }, 
+        {
+             {{10,   20}, {30,   40}}, 
+             {{50,   60}, {70,   80}},
+             {{90,  100}, {110, 120}},
+             {{130, 140}, {150, 160}}
+        }
+    });
+    Vector* v = create_vector_from_stdvec({1, 2});
+
+    Convolution* Conv = create_convolution(M, v, 1, 0);
+
+    Matrix4d* X = create_matrix4d_from_stdvec({
+        {
+            {{1,   2}, {3,   4}}, 
+            {{5,   6}, {7,   8}},
+            {{9,  10}, {11, 12}},
+            {{13, 14}, {15, 16}}
+        }, 
+        {
+             {{10,   20}, {30,   40}}, 
+             {{50,   60}, {70,   80}},
+             {{90,  100}, {110, 120}},
+             {{130, 140}, {150, 160}}
+        }
+    });
+
+    Matrix4d* F = convolution_forward(Conv, X);
+
+    const std::vector<std::vector<std::vector<std::vector<double>>>> ans = {  
+        {
+            {{1497}},
+            {{14962}},
+        },
+        {
+            {{14961}},
+            {{149602}},
+        }
+    };
+    EXPECT_MATRIX4D_EQ(ans, F);
+
+    Matrix4d* B = convolution_backward(Conv, F);
+    const std::vector<std::vector<std::vector<std::vector<double>>>> ans2 = {  
+        {
+            {{  151117,   302234.},
+             {  453351,   604468.}},
+        
+            {{  755585,   906702.},
+             { 1057819,  1208936.}},
+        
+            {{ 1360053,  1511170.},
+             { 1662287,  1813404.}},
+        
+            {{ 1964521,  2115638.},
+             { 2266755,  2417872.}},
+        },
+        {  
+            {{ 1510981,  3021962.},
+             { 4532943,  6043924.}},
+        
+            {{ 7554905,  9065886.},
+             {10576867, 12087848.}},
+        
+            {{13598829, 15109810.},
+             {16620791, 18131772.}},
+        
+            {{19642753, 21153734.},
+             {22664715, 24175696.}},
+        }
+    };
+    EXPECT_MATRIX4D_EQ(ans2, B);
+
+    free_matrix_4d(F);
+    free_matrix_4d(B);
+
+    free_convolution(Conv);
+}
+

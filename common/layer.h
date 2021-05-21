@@ -55,6 +55,19 @@ struct Dropout {
     Mask* mask;
 };
 
+typedef struct Convolution Convolution;
+struct Convolution {
+    Matrix4d* W;
+    Vector* b;
+    int stride;
+    int pad;
+    Matrix4d* x;
+    Matrix* col;
+    Matrix* col_W;
+    Vector* db;
+    Matrix4d* dW;
+};
+
 Affine* create_affine(Matrix* W, Vector* b);
 void free_affine(Affine* A);
 Matrix* affine_forward(Affine* A, const Matrix* X);
@@ -79,5 +92,10 @@ Dropout* create_dropout(double dropout_ratio);
 void free_dropout(Dropout* D);
 Matrix* dropout_forward(Dropout* D, const Matrix* X);
 Matrix* dropout_backward(const Dropout* D, const Matrix* X);
+
+Convolution* create_convolution(Matrix4d* W, Vector* b, int stride, int pad);
+void free_convolution(Convolution* C);
+Matrix4d* convolution_forward(Convolution* C, Matrix4d* X);
+Matrix4d* convolution_backward(Convolution* C, const Matrix4d* X);
 
 #endif

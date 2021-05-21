@@ -400,3 +400,103 @@ Matrix* dropout_backward(const Dropout* D, const Matrix* X) {
 
     return M;
 }
+
+Convolution* create_convolution(Matrix4d* W, Vector* b, int stride, int pad) {
+    Convolution* Conv = malloc(sizeof(Convolution));
+    Conv->W = W;
+    Conv->b = b;
+    Conv->stride = stride;
+    Conv->pad = pad;
+
+    Conv->x = NULL;
+    Conv->col = NULL;
+    Conv->col_W = NULL;
+    Conv->db = NULL;
+    Conv->dW = NULL;
+
+    return Conv;
+}
+
+void free_convolution(Convolution* C) {
+    free_matrix_4d(C->W);
+    free_vector(C->b);
+    free_matrix_4d(C->x);
+    free_matrix(C->col);
+    free_matrix(C->col_W);
+}
+
+Matrix4d* convolution_forward(Convolution* Conv, Matrix4d* X) {
+    const int FN = Conv->W->sizes[0];
+    // const int C  = Conv->W->sizes[1];
+    const int FH = Conv->W->sizes[2];
+    const int FW = Conv->W->sizes[3];
+    
+    const int N  = X->sizes[0];
+    // const int C2 = X->sizes[1];
+    const int H  = X->sizes[2];
+    const int W  = X->sizes[3];
+
+    const int out_h = 1 + (int)((H + 2 * Conv->pad - FH) / Conv->stride);
+    const int out_w = 1 + (int)((W + 2 * Conv->pad - FW) / Conv->stride);
+
+    Matrix* col = im2col(X, FH, FW, Conv->stride, Conv->pad);
+
+    Matrix* tmp2 = matrix_reshape_to_2d(Conv->W, FN, -1);
+    Matrix* col_W = transpose(tmp2);
+
+    Matrix* tmp = dot_matrix(col, col_W);
+    Matrix* out = matrix_add_vector(tmp, Conv->b);
+
+    Matrix4d* out_r = matrix_reshape_to_4d(out, N, out_h, out_w, -1);
+    Matrix4d* out_rt = matrix_4d_transpose(out_r, 0, 3, 1, 2);
+
+    free_matrix(tmp);
+    free_matrix(tmp2);
+    free_matrix(out);
+    free_matrix_4d(out_r);
+
+    if (Conv->x != NULL) {
+        free_matrix_4d(Conv->x);
+    }
+    Conv->x = X;
+
+    if (Conv->col != NULL) {
+        free_matrix(Conv->col);
+    }
+    Conv->col = col;
+
+    if (Conv->col_W != NULL) {
+        free_matrix(Conv->col_W);
+    }
+    Conv->col_W = col_W;
+
+    return out_rt;
+}
+
+Matrix4d* convolution_backward(Convolution* Conv, const Matrix4d* X) {
+    const int FN = Conv->W->sizes[0];
+    const int C  = Conv->W->sizes[1];
+    const int FH = Conv->W->sizes[2];
+    const int FW = Conv->W->sizes[3];
+    
+    Matrix4d* tmp = matrix_4d_transpose(X, 0, 2, 3, 1);  
+    Matrix* dout = matrix_reshape_to_2d(tmp, -1, FN);
+
+    // db
+    Conv->db = matrix_col_sum(dout);
+
+    // dW
+    Matrix* col_T = transpose(Conv->col);
+    Matrix* dW = dot_matrix(col_T, dout);
+    Matrix* dW_T = transpose(dW);
+    Conv->dW = matrix_reshape_to_4d(dW_T, FN, C, FH, FW);
+
+    // dcol
+    Matrix* col_W_T = transpose(Conv->col_W);
+    Matrix* dcol = dot_matrix(dout, col_W_T);
+
+    Matrix4d* dx = col2im(dcol, Conv->x->sizes, FH, FW, Conv->stride, Conv->pad);  
+
+    return dx;
+}
+

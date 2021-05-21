@@ -503,6 +503,77 @@ TEST(matrix_reshape_to_2d, success) {
     free_matrix(N);
 }
 
+TEST(matrix_reshape_to_2d, success2) {
+    Matrix4d* M = create_matrix4d_from_stdvec({
+       {
+            {{1,   2}, {3,   4}}, 
+            {{5,   6}, {7,   8}},
+            {{9,  10}, {11, 12}},
+            {{13, 14}, {15, 16}}
+       }, 
+       {
+            {{1,   2}, {3,   4}}, 
+            {{5,   6}, {7,   8}},
+            {{9,  10}, {11, 12}},
+            {{13, 14}, {15, 16}}
+       }
+    });
+
+    Matrix* N = matrix_reshape_to_2d(M, 8, -1);
+
+    std::vector<std::vector<double>> ans = {
+        { 1,  2,  3,  4},
+        { 5,  6,  7,  8},
+        { 9, 10, 11, 12},
+        {13, 14, 15, 16},
+        { 1,  2,  3,  4},
+        { 5,  6,  7,  8},
+        { 9, 10, 11, 12},
+        {13, 14, 15, 16},
+    };
+
+    EXPECT_MATRIX_EQ(ans, N);
+
+    free_matrix_4d(M);
+    free_matrix(N);
+}
+
+TEST(matrix_reshape_to_2d, success3) {
+    Matrix4d* M = create_matrix4d_from_stdvec({
+       {
+            {{1,   2}, {3,   4}}, 
+            {{5,   6}, {7,   8}},
+            {{9,  10}, {11, 12}},
+            {{13, 14}, {15, 16}}
+       }, 
+       {
+            {{1,   2}, {3,   4}}, 
+            {{5,   6}, {7,   8}},
+            {{9,  10}, {11, 12}},
+            {{13, 14}, {15, 16}}
+       }
+    });
+
+    Matrix* N = matrix_reshape_to_2d(M, -1, 4);
+
+    std::vector<std::vector<double>> ans = {
+        { 1,  2,  3,  4},
+        { 5,  6,  7,  8},
+        { 9, 10, 11, 12},
+        {13, 14, 15, 16},
+        { 1,  2,  3,  4},
+        { 5,  6,  7,  8},
+        { 9, 10, 11, 12},
+        {13, 14, 15, 16},
+    };
+
+    EXPECT_MATRIX_EQ(ans, N);
+
+    free_matrix_4d(M);
+    free_matrix(N);
+}
+
+
 TEST(matrix_reshape_to_4d, success) {
     Matrix* M = create_matrix_from_stdvec(
     {
@@ -538,6 +609,43 @@ TEST(matrix_reshape_to_4d, success) {
     free_matrix(M);
     free_matrix_4d(N);
 }
+
+TEST(matrix_reshape_to_4d, success2) {
+    Matrix* M = create_matrix_from_stdvec(
+    {
+        { 1,  2,  3,  4},
+        { 5,  6,  7,  8},
+        { 9, 10, 11, 12},
+        {13, 14, 15, 16},
+        { 1,  2,  3,  4},
+        { 5,  6,  7,  8},
+        { 9, 10, 11, 12},
+        {13, 14, 15, 16},
+    });
+
+    Matrix4d* N = matrix_reshape_to_4d(M, 2, 4, 2, -1);
+
+    std::vector<std::vector<std::vector<std::vector<double>>>> ans = {  
+       {
+            {{1,   2}, {3,   4}}, 
+            {{5,   6}, {7,   8}},
+            {{9,  10}, {11, 12}},
+            {{13, 14}, {15, 16}}
+       }, 
+       {
+            {{1,   2}, {3,   4}}, 
+            {{5,   6}, {7,   8}},
+            {{9,  10}, {11, 12}},
+            {{13, 14}, {15, 16}}
+       }
+    };
+
+    EXPECT_MATRIX4D_EQ(ans, N);
+
+    free_matrix(M);
+    free_matrix_4d(N);
+}
+
 
 TEST(matrix_sum, success) {
     Matrix* M = create_matrix_from_stdvec({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}});

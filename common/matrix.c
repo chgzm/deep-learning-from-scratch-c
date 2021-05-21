@@ -404,13 +404,12 @@ Matrix* matrix_reshape_to_2d(const Matrix4d* M, int rows, int cols) {
 }
 
 Matrix4d* matrix_reshape_to_4d(const Matrix* M, int s1, int s2, int s3, int s4) {
-    Matrix4d* R = create_matrix_4d(s1, s2, s3, s4);
-    
     int sizes[] = {s1, s2, s3, s4};
     if (s4 < 0) {
         sizes[3] = M->rows * M->cols / (s1 * s2 * s3);
     }
 
+    Matrix4d* R = create_matrix_4d(sizes[0], sizes[1], sizes[2], sizes[3]);
     int p1 = 0, p2 = 0, p3 = 0, p4 = 0;
     for (int i = 0; i < M->rows; ++i) {
         for (int j = 0; j < M->cols; ++j) {
