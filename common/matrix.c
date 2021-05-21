@@ -636,6 +636,26 @@ Matrix4d* col2im(const Matrix* M, int* sizes, int filter_h, int filter_w, int st
     return R;
 }
 
+Matrix4d* matrix_4d_pad(const Matrix4d* M, int pad) {
+    Matrix4d* R = create_matrix_4d(M->sizes[0], M->sizes[1], M->sizes[2] + 2 * pad, M->sizes[3] + 2 * pad);
+
+    for (int i = 0; i < R->sizes[0]; ++i) {
+        for (int j = 0; j < R->sizes[1]; ++j) {
+            for (int k = 0; k < R->sizes[2]; ++k) {
+                for (int l = 0; l < R->sizes[3]; ++l) {
+                    if ((k < pad) || ((M->sizes[2] + pad) <= k) || (l < pad) || ((M->sizes[3] + pad) <= l)) {
+                        R->elements[i][j][k][l] = 0;  
+                    } else {
+                        R->elements[i][j][k][l] = M->elements[i][j][k - pad][l - pad];
+                    }
+                }
+            }
+        }
+    }
+
+    return R;
+}
+
 //
 // create batch
 //

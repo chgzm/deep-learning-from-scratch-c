@@ -84,6 +84,7 @@ void scalar_vector(Vector* V, double k);
 
 Matrix* im2col(const Matrix4d* M, int filter_h, int filter_w, int stride, int pad);
 Matrix4d* col2im(const Matrix* M, int* sizes, int filter_h, int filter_w, int stride, int pad);
+Matrix4d* matrix_4d_pad(const Matrix4d* M, int pad);
 
 //
 // create batch
