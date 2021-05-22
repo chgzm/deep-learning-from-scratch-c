@@ -13,5 +13,6 @@ Vector* vector_softmax(const Vector* v);
 Matrix* matrix_softmax(const Matrix* M);
 
 int argmax(const Vector* v);
+int* argmax_row(const Matrix* M);
 
 #endif

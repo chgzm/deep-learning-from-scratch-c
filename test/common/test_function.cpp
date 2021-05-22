@@ -1,5 +1,7 @@
 #include "gtest/gtest.h"
 
+#include "utest_util.h"
+
 extern "C" {
 #include <function.h>
 }
@@ -110,4 +112,20 @@ TEST(argmax, success) {
 
     free_vector(v);
 }
+
+TEST(argmax_row, success) {
+    Matrix* M = create_matrix_from_stdvec({{1, 2, 3}, {4, 6, 5}, {9, 8, 7}});
+    int* arg_max = argmax_row(M);
+
+    int ans[] = {2, 1, 0};
+    for (int i = 0; i < M->rows; ++i) {
+        EXPECT_EQ(ans[i], arg_max[i]);
+    }
+
+    free_matrix(M);
+    free(arg_max);
+}
+
+
+
 

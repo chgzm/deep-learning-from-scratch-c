@@ -1,6 +1,9 @@
 #include "function.h"
+
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
+#include <float.h>
 
 double sigmoid(double x) {
     return 1.0 / (1.0 + exp(-x));
@@ -100,4 +103,23 @@ int argmax(const Vector* v) {
     }
 
     return index;
+}
+
+int* argmax_row(const Matrix* M) {
+    int* arg_max = (int*)malloc(sizeof(int) * M->rows);
+
+    for (int i = 0; i < M->rows; ++i) {
+        int idx = 0;
+        double max = - DBL_MAX;
+        for (int j = 0; j < M->cols; ++j) {
+            if (max < M->elements[i][j]) {
+                idx = j;
+                max = M->elements[i][j];
+            }
+        }
+
+        arg_max[i] = idx;
+    }
+
+    return arg_max;
 }
