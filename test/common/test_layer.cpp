@@ -184,3 +184,187 @@ TEST(convolution_forward_backward, success) {
     free_convolution(Conv);
 }
 
+TEST(convolution_forward_backward, success2) {
+    Matrix4d* M = create_matrix4d_from_stdvec({
+        {
+            {{ 1,  2}, { 3,  4}}, 
+            {{ 5,  6}, { 7,  8}},
+            {{ 9, 10}, {11, 12}},
+            {{13, 14}, {15, 16}}
+        }, 
+        {
+            {{ 101,  102}, { 103,  104}}, 
+            {{ 105,  106}, { 107,  108}},
+            {{ 109, 1010}, {1011, 1012}},
+            {{1013, 1014}, {1015, 1016}}
+        }
+    });
+    Vector* v = create_vector_from_stdvec({1, 2});
+
+    Convolution* Conv = create_convolution(M, v, 2, 1);
+
+    Matrix4d* X = create_matrix4d_from_stdvec({
+        {
+            {{ 1,  2}, { 3,  4}}, 
+            {{ 5,  6}, { 7,  8}},
+            {{ 9, 10}, {11, 12}},
+            {{13, 14}, {15, 16}}
+        }, 
+        {
+            {{ 10,  20}, { 30,  40}}, 
+            {{ 50,  60}, { 70,  80}},
+            {{ 90, 100}, {110, 120}},
+            {{130, 140}, {150, 160}}
+        }
+    });
+
+    Matrix4d* F = convolution_forward(Conv, X);
+
+    const std::vector<std::vector<std::vector<std::vector<double>>>> ans = {  
+        {
+            {
+                {361, 369},
+                {369, 361}
+            },
+            {
+                {22962, 25170},
+                {27370, 18762}}
+            },
+        {
+            {
+                {3601, 3681},
+                {3681, 3601}
+            },
+            {
+                {229602, 251682},
+                {273682, 187602}
+            }
+        }
+    };
+    EXPECT_MATRIX4D_EQ(ans, F);
+
+    scalar_matrix_4d(F, 0.0001);
+    
+    Matrix4d* B = convolution_backward(Conv, F);
+    const std::vector<std::vector<std::vector<std::vector<double>>>> ans2 = {  
+        {
+            {
+                {  238.9492,  259.3617},
+                {  279.2478,  189.5323}
+            },
+            {
+                {  248.2784,  269.5773},
+                {  290.3434,  197.1815}
+            },
+            {
+                { 2324.1876, 2545.0929},
+                { 2764.739,   204.8307}
+            },
+            {
+                { 2333.5168, 2555.3085},
+                { 2775.8346, 1901.0599}
+            }
+        },
+        {
+            {
+                { 2389.3012, 2593.4289},
+                { 2792.2926, 1895.1403}
+            },
+            {   
+                { 2482.5824, 2695.5741},
+                { 2903.2378, 1971.6215}
+            },
+            {
+                {23240.0436, 25449.0993},
+                {27645.563,   2048.1027}
+            },
+            {
+                {23333.3248, 25551.2445},
+                {27756.5082, 19008.7639}
+            }
+        }
+    };
+    EXPECT_MATRIX4D_EQ(ans2, B);
+
+    free_matrix_4d(F);
+    free_matrix_4d(B);
+    free_convolution(Conv);
+}
+
+TEST(pooling_forward_backward, success) {
+    Pooling* P = create_pooling(2, 2, 2, 0);
+
+    Matrix4d* X = create_matrix4d_from_stdvec({
+        {
+            {{1, 1}, {1, 1}}, 
+            {{2, 2}, {2, 2}}, 
+            {{3, 3}, {3, 3}}, 
+        }, 
+        {
+            {{4, 4}, {4, 4}}, 
+            {{5, 5}, {5, 5}},
+            {{6, 6}, {6, 6}}
+        }, 
+        {
+            {{7, 7}, {7, 7}}, 
+            {{8, 8}, {8, 8}},
+            {{9, 9}, {9, 9}}
+        }, 
+        {
+            {{10, 10}, {10, 10}}, 
+            {{11, 11}, {11, 11}},
+            {{12, 12}, {12, 12}}
+        }
+    });
+  
+    Matrix4d* F = pooling_forward(P, X);
+
+    const std::vector<std::vector<std::vector<std::vector<double>>>> ans = {
+        {{{ 1}},
+         {{ 2}},
+         {{ 3}}},
+        {{{ 4}},
+         {{ 5}},
+         {{ 6}}},
+        {{{ 7}},
+         {{ 8}},
+         {{ 9}}},
+        {{{10}},
+         {{11}},
+         {{12}}}
+    };
+    EXPECT_MATRIX4D_EQ(ans, F);
+
+    Matrix4d* B = pooling_backward(P, F);
+    
+    const std::vector<std::vector<std::vector<std::vector<double>>>> ans2 = {
+        {{{ 1, 0},
+           { 0, 0}},
+          {{ 2, 0},
+           { 0, 0}},
+          {{ 3, 0},
+           { 0, 0}}},
+         {{{ 4, 0},
+           { 0, 0}},
+          {{ 5, 0},
+           { 0, 0}},
+          {{ 6, 0},
+           { 0, 0}}},
+         {{{ 7, 0},
+           { 0, 0}},
+          {{ 8, 0},
+           { 0, 0}},
+          {{ 9, 0},
+           { 0, 0}}},
+         {{{10, 0},
+           { 0, 0}},
+          {{11, 0},
+           { 0, 0}},
+          {{12, 0},
+           { 0, 0}}}
+    };
+    EXPECT_MATRIX4D_EQ(ans2, B);
+
+    free_matrix_4d(F);
+    free_matrix_4d(B);
+}

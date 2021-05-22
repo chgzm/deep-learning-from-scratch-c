@@ -698,8 +698,6 @@ Matrix4d* col2im(const Matrix* M, int* sizes, int filter_h, int filter_w, int st
     const int out_w = (W + 2 * pad - filter_w) / stride + 1; 
     Matrix4d* B = create_matrix_4d(N, C, H + 2 * pad + stride - 1, W + 2 * pad + stride - 1);
 
-    // Matrix4d* R = create_matrix_4d(N, C, H, W);
-
     int n = 0, c = 0, h = 0, w = 0;
     for (int i = 0; i < M->rows; ++i) {
         for (int j = 0; j < M->cols; j += (filter_h * filter_w)) {

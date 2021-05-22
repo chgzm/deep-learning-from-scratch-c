@@ -280,8 +280,6 @@ Matrix* batch_normalization_forward(BatchNormalization* B, const Matrix* X) {
     free_matrix(xc_tmp);
     free_matrix(l);
 
-    // print_matrix(out);
-
     return out;
 }
 
@@ -440,7 +438,6 @@ Matrix4d* convolution_forward(Convolution* Conv, Matrix4d* X) {
     const int out_w = 1 + (int)((W + 2 * Conv->pad - FW) / Conv->stride);
 
     Matrix* col = im2col(X, FH, FW, Conv->stride, Conv->pad);
-
     Matrix* tmp2 = matrix_reshape_to_2d(Conv->W, FN, -1);
     Matrix* col_W = transpose(tmp2);
 
@@ -500,3 +497,89 @@ Matrix4d* convolution_backward(Convolution* Conv, const Matrix4d* X) {
     return dx;
 }
 
+Pooling* create_pooling(int pool_h, int pool_w, int stride, int pad) {
+    Pooling* P = malloc(sizeof(Pooling));
+    P->pool_h  = pool_h;
+    P->pool_w  = pool_w;
+    P->stride  = stride;
+    P->pad     = pad;
+    P->x       = NULL;
+    P->arg_max = NULL;
+    return P;
+}
+
+void free_pooling(Pooling* P) {
+    free_matrix_4d(P->x);
+    free(P->arg_max);
+    free(P);
+}
+
+Matrix4d* pooling_forward(Pooling* P, Matrix4d* X) {
+    const int N  = X->sizes[0];
+    const int C  = X->sizes[1];
+    const int H  = X->sizes[2];
+    const int W  = X->sizes[3];
+
+    const int out_h = 1 + (H - P->pool_h) / P->stride;
+    const int out_w = 1 + (W - P->pool_w) / P->stride;
+
+    Matrix* tmp = im2col(X, P->pool_h, P->pool_w, P->stride, P->pad);
+    Matrix* col = matrix_reshape(tmp, -1, P->pool_h * P->pool_w);
+
+    if (P->arg_max != NULL) {
+        free(P->arg_max);
+    }
+    P->arg_max = argmax_row(col); 
+
+    Vector* tmp2 = matrix_row_max(col);
+
+    Matrix4d* tmp3 = vector_reshape_to_4d(tmp2, N, out_h, out_w, C);
+    Matrix4d* out = matrix_4d_transpose(tmp3, 0, 3, 1, 2);
+   
+    if (P->x != NULL) {
+        free(P->x);
+    }
+    P->x = X;
+
+    free_matrix(tmp);
+    free_matrix(col);
+    free_vector(tmp2);
+    free_matrix_4d(tmp3);
+
+    return out;
+}
+
+Matrix4d* pooling_backward(const Pooling* P, const Matrix4d* X) {
+    Matrix4d* dout = matrix_4d_transpose(X, 0, 2, 3, 1);
+
+    const int pool_size = P->pool_h * P->pool_w;
+    const int dout_size = dout->sizes[0] * dout->sizes[1] * dout->sizes[2] * dout->sizes[3];
+    Matrix* dmax = create_matrix(dout_size, pool_size); 
+
+    Vector* dout_flat = matrix_4d_flatten(dout);
+    for (int i = 0; i < dmax->rows; ++i) {
+        dmax->elements[i][P->arg_max[i]] = dout_flat->elements[i];
+    }
+
+    Matrix* dcol = create_matrix(dout->sizes[0] * dout->sizes[1] * dout->sizes[2], dout->sizes[3] * pool_size);
+    int r_pos = 0, c_pos = 0;
+    for (int i = 0; i < dmax->rows; ++i) {
+        for (int j = 0; j < dmax->cols; ++j) {
+            dcol->elements[r_pos][c_pos++] = dmax->elements[i][j];
+            if (c_pos == dcol->cols) {
+                c_pos = 0;
+                ++r_pos;
+            }
+        }
+    }
+
+    int sizes[4] = {P->x->sizes[0], P->x->sizes[1], P->x->sizes[2], P->x->sizes[3]};
+    Matrix4d* dx = col2im(dcol, sizes, P->pool_h, P->pool_w, P->stride, P->pad);
+
+    free_matrix_4d(dout); 
+    free_matrix(dmax); 
+    free_vector(dout_flat); 
+    free_matrix(dcol); 
+
+    return dx;
+}

@@ -68,6 +68,16 @@ struct Convolution {
     Matrix4d* dW;
 };
 
+typedef struct Pooling Pooling;
+struct Pooling {
+    int pool_h;
+    int pool_w;
+    int stride;
+    int pad;
+    Matrix4d* x;
+    int* arg_max;
+};
+
 Affine* create_affine(Matrix* W, Vector* b);
 void free_affine(Affine* A);
 Matrix* affine_forward(Affine* A, const Matrix* X);
@@ -97,5 +107,10 @@ Convolution* create_convolution(Matrix4d* W, Vector* b, int stride, int pad);
 void free_convolution(Convolution* C);
 Matrix4d* convolution_forward(Convolution* C, Matrix4d* X);
 Matrix4d* convolution_backward(Convolution* C, const Matrix4d* X);
+
+Pooling* create_pooling(int pool_h, int pool_w, int stride, int pad);
+void free_pooling(Pooling* P);
+Matrix4d* pooling_forward(Pooling* P, Matrix4d* X);
+Matrix4d* pooling_backward(const Pooling* P, const Matrix4d* X);
 
 #endif
