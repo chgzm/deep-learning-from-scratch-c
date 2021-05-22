@@ -516,6 +516,22 @@ Matrix4d* matrix_reshape_to_4d(const Matrix* M, int s1, int s2, int s3, int s4) 
     return R;
 }
 
+Vector* matrix_4d_flatten(const Matrix4d* M) {
+    Vector* v = create_vector(M->sizes[0] * M->sizes[1] * M->sizes[2] * M->sizes[3]);
+
+    int pos = 0;
+    for (int i = 0; i < M->sizes[0]; ++i) {
+        for (int j = 0; j < M->sizes[1]; ++j) {
+            for (int k = 0; k < M->sizes[2]; ++k) {
+                for (int l = 0; l < M->sizes[3]; ++l) {
+                    v->elements[pos++] = M->elements[i][j][k][l];
+                }
+            }
+        }
+    }
+
+    return v;
+}
 
 double matrix_sum(const Matrix* M) {
     double sum = 0.0;

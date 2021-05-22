@@ -810,6 +810,33 @@ TEST(matrix_reshape_to_4d, success2) {
     free_matrix_4d(N);
 }
 
+TEST(matrix_4d_flatten, success) {
+    Matrix4d* M = create_matrix4d_from_stdvec({
+        {
+             {{1,   2}, {3,   4}}, 
+             {{5,   6}, {7,   8}},
+             {{9,  10}, {11, 12}},
+             {{13, 14}, {15, 16}}
+        }, 
+        {
+             {{1,   2}, {3,   4}}, 
+             {{5,   6}, {7,   8}},
+             {{9,  10}, {11, 12}},
+             {{13, 14}, {15, 16}}
+        }
+    });
+
+    Vector* v = matrix_4d_flatten(M);
+
+    const std::vector<double> ans = {
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+    };
+    EXPECT_VECTOR_EQ(ans, v);
+
+    free_vector(v);
+    free_matrix_4d(M);  
+}
 
 TEST(matrix_sum, success) {
     Matrix* M = create_matrix_from_stdvec({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}});

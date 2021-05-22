@@ -68,6 +68,7 @@ Matrix4d* vector_reshape_to_4d(const Vector* v, int s1, int s2, int s3, int s4);
 Matrix* matrix_reshape(const Matrix* M, int rows, int cols);
 Matrix* matrix_reshape_to_2d(const Matrix4d* M, int rows, int cols);
 Matrix4d* matrix_reshape_to_4d(const Matrix* M, int s1, int s2, int s3, int s4);
+Vector* matrix_4d_flatten(const Matrix4d* M);
 
 double matrix_sum(const Matrix* M);
 Vector* matrix_col_mean(const Matrix* M);
