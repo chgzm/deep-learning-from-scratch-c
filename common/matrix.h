@@ -39,6 +39,7 @@ int init_vector_from_file(Vector* v, const char* file_path);
 void init_vector_from_array(Vector* v, double* vals);
 int init_matrix_from_file(Matrix* M, const char* file_path);
 void init_matrix_random(Matrix* M);
+void init_matrix_4d_random(Matrix4d* M);
 void init_matrix_rand(Matrix* M);
 void copy_matrix(Matrix* dst, const Matrix* src);
 void copy_vector(Vector* dst, const Vector* src);

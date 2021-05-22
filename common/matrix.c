@@ -141,6 +141,18 @@ void init_matrix_random(Matrix* M) {
     }
 }
 
+void init_matrix_4d_random(Matrix4d* M) {
+    for (int i = 0; i < M->sizes[0]; ++i) {
+        for (int j = 0; j < M->sizes[1]; ++j) {
+            for (int k = 0; k < M->sizes[2]; ++k) {
+                for (int l = 0; l < M->sizes[3]; ++l) {
+                    M->elements[i][j][k][l] = rand_normal();
+                }
+            }
+        }
+    }
+}
+
 void init_matrix_rand(Matrix* M) {
     for (int i = 0; i < M->rows; ++i) {
         for (int j = 0; j < M->cols; ++j) {

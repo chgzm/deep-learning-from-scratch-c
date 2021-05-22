@@ -127,9 +127,9 @@ TEST(copy_matrix, success) {
 
 TEST(init_matrix_random, success) {
     Matrix* M = create_matrix(100, 100);
-    init_matrix_random(M);
 
     srand(100);
+    init_matrix_random(M);
     double sum = 0.0;
     for (int i = 0; i < M->rows; ++i) {
         for (int j = 0; j < M->cols; ++j) {
@@ -144,6 +144,31 @@ TEST(init_matrix_random, success) {
     EXPECT_LT(-0.1, mean);
 
     free_matrix(M);
+}
+
+TEST(init_matrix_4d_random, success) {
+    Matrix4d* M = create_matrix_4d(10, 10, 10, 10);
+
+    srand(100);
+    init_matrix_4d_random(M);
+    double sum = 0.0;
+    for (int i = 0; i < M->sizes[0]; ++i) {
+        for (int j = 0; j < M->sizes[1]; ++j) {
+            for (int k = 0; k < M->sizes[2]; ++k) {
+                for (int l = 0; l < M->sizes[3]; ++l) {
+                    EXPECT_LT(M->elements[i][j][k][l], 5.0);
+                    EXPECT_LT(-5.0, M->elements[i][j][k][l]);
+                    sum += M->elements[i][j][k][l];
+                }
+            }
+        }
+    }
+
+    const double mean = sum / (10 * 10 * 10 * 10);
+    EXPECT_LT(mean, 0.1);
+    EXPECT_LT(-0.1, mean);
+
+    free_matrix_4d(M);
 }
 
 TEST(init_matrix_rand, success) {
