@@ -402,6 +402,36 @@ Matrix4d* matrix_4d_transpose(const Matrix4d* M, int n1, int n2, int n3, int n4)
     return R;
 }
 
+Matrix4d* vector_reshape_to_4d(const Vector* v, int s1, int s2, int s3, int s4) {
+    int sizes[] = {s1, s2, s3, s4};
+    if (s4 < 0) {
+        sizes[3] = v->size / (s1 * s2 * s3);
+    }
+
+    Matrix4d* R = create_matrix_4d(sizes[0], sizes[1], sizes[2], sizes[3]);
+    int p1 = 0, p2 = 0, p3 = 0, p4 = 0;
+    for (int i = 0; i < v->size; ++i) {
+        R->elements[p1][p2][p3][p4] = v->elements[i];
+        ++p4;
+        if (p4 == sizes[3]) {
+            p4 = 0;
+            ++p3;
+        }
+
+        if (p3 == sizes[2]) {
+            p3 = 0;
+            ++p2;
+        }
+
+        if (p2 == sizes[1]) {
+            p2 = 0;
+            ++p1;
+        } 
+    }
+
+    return R;
+}
+
 Matrix* matrix_reshape(const Matrix* M, int rows, int cols) {
     int r = rows;
     int c = cols;

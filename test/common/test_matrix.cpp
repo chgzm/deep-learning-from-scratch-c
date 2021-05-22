@@ -515,6 +515,42 @@ TEST(matrix_4d_transpose, success2) {
     free_matrix_4d(MT);
 }
 
+TEST(vector_reshape_to_4d, success) {
+    Vector* v = create_vector_from_stdvec({
+        1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 
+        7, 7, 7, 7, 8, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, 11, 11, 11, 11, 12, 12, 12, 12
+    });
+
+    Matrix4d* M = vector_reshape_to_4d(v, 4, 3, 2, 2); 
+
+    const std::vector<std::vector<std::vector<std::vector<double>>>> ans = {  
+        {
+            {{1, 1}, {1, 1}}, 
+            {{2, 2}, {2, 2}}, 
+            {{3, 3}, {3, 3}}, 
+        }, 
+        {
+            {{4, 4}, {4, 4}}, 
+            {{5, 5}, {5, 5}},
+            {{6, 6}, {6, 6}}
+        }, 
+        {
+            {{7, 7}, {7, 7}}, 
+            {{8, 8}, {8, 8}},
+            {{9, 9}, {9, 9}}
+        }, 
+        {
+            {{10, 10}, {10, 10}}, 
+            {{11, 11}, {11, 11}},
+            {{12, 12}, {12, 12}}
+        }
+    };
+    EXPECT_MATRIX4D_EQ(ans, M);
+
+    free_vector(v);
+    free_matrix_4d(M);
+}   
+
 TEST(matrix_reshape, success) {
     Matrix* M = create_matrix_from_stdvec(
     {
