@@ -323,6 +323,18 @@ void scalar_matrix(Matrix* M, double k) {
     }
 }
 
+void scalar_matrix_4d(Matrix4d* M, double v) {
+    for (int i = 0; i < M->sizes[0]; ++i) {
+        for (int j = 0; j < M->sizes[1]; ++j) {
+            for (int k = 0; k < M->sizes[2]; ++k) {
+                for (int l = 0; l < M->sizes[3]; ++l) {
+                    M->elements[i][j][k][l] *= v;
+                }
+            }
+       }
+    }
+}
+
 Matrix* _scalar_matrix(const Matrix* M, double k) {
     Matrix* R = create_matrix(M->rows, M->cols);
     for (int i = 0; i < M->rows; ++i) {
@@ -368,6 +380,30 @@ Matrix4d* matrix_4d_transpose(const Matrix4d* M, int n1, int n2, int n3, int n4)
 
                     R->elements[idx[0]][idx[1]][idx[2]][idx[3]] = M->elements[i][j][k][l]; 
                 }
+            }
+        }
+    }
+
+    return R;
+}
+
+Matrix* matrix_reshape(const Matrix* M, int rows, int cols) {
+    int r = rows;
+    int c = cols;
+    if (rows < 0) {
+        r = (M->rows * M->cols) / cols;
+    } else if (cols < 0) {
+        c = (M->rows * M->cols) / rows;
+    }
+
+    int r_pos = 0, c_pos = 0;
+    Matrix* R = create_matrix(r, c);
+    for (int i = 0; i < M->rows; ++i) {
+        for (int j = 0; j < M->cols; ++j) {
+            R->elements[r_pos][c_pos++] = M->elements[i][j];
+            if (c_pos == c) {
+                c_pos = 0;
+                ++r_pos;
             }
         }
     }
