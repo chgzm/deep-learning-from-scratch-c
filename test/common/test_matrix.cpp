@@ -335,6 +335,16 @@ TEST(matrix_col_sum, success) {
     free_vector(v);
 }
 
+TEST(matrix_row_max, success) {
+    Matrix* M = create_matrix_from_stdvec({{4, 2, 3, 1}, {5, 8, 7, 6}, {9, 10, 11, 12}});
+    
+    Vector* v = matrix_row_max(M);
+    EXPECT_VECTOR_EQ({4, 8, 12}, v);
+
+    free_matrix(M);
+    free_vector(v);
+}
+
 TEST(scalar_matrix, success) {
     Matrix* M = create_matrix_from_stdvec({{1, 2, 3}, {4, 5, 6}, {7, 8, 9}});
 

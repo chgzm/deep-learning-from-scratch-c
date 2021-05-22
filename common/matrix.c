@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <time.h>
 #include <math.h>
+#include <float.h>
 
 //
 // factory
@@ -310,6 +311,20 @@ Vector* matrix_col_sum(const Matrix* M) {
             sum += M->elements[j][i];
         }
         v->elements[i] = sum;
+    }
+
+    return v;
+}
+
+Vector* matrix_row_max(const Matrix* M) {
+    Vector* v = create_vector(M->rows);
+
+    for (int i = 0; i < M->rows; ++i) {
+        double max_val = -DBL_MAX;
+        for (int j = 0; j < M->cols; ++j) {
+            max_val = fmax(max_val, M->elements[i][j]);
+        }
+        v->elements[i] = max_val;
     }
 
     return v;

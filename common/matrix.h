@@ -71,6 +71,7 @@ Matrix4d* matrix_reshape_to_4d(const Matrix* M, int s1, int s2, int s3, int s4);
 double matrix_sum(const Matrix* M);
 Vector* matrix_col_mean(const Matrix* M);
 Vector* matrix_col_sum(const Matrix* M);
+Vector* matrix_row_max(const Matrix* M);
 Vector* vector_div_vector(const Vector* V, const Vector* U);
 Matrix* matrix_add_vector(const Matrix* M, const Vector* V);
 Matrix* matrix_add_matrix(const Matrix* M, const Matrix* N);
