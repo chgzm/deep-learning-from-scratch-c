@@ -26,6 +26,76 @@ TEST(affine_forward_backward, success) {
     free_matrix(N);
 }
 
+TEST(affine_4d_forward_backward, success) {
+    Matrix* W = create_matrix_from_stdvec({
+            {0.1, 0.2, 0.3}, 
+            {0.4, 0.5, 0.6}, 
+            {0.7, 0.8, 0.9}, 
+            {1.0, 1.1, 1.2},
+            {0.1, 0.2, 0.3}, 
+            {0.4, 0.5, 0.6}, 
+            {0.7, 0.8, 0.9}, 
+            {1.0, 1.1, 1.2}
+    });
+    Vector* b = create_vector_from_stdvec({1, 2, 3});
+    Affine* A = create_affine(W, b);
+
+    Matrix4d* X = create_matrix4d_from_stdvec({
+        {
+            {{1,   2}, {3,   4}}, 
+            {{5,   6}, {7,   8}}
+        },
+        {
+            {{9,  10}, {11, 12}},
+            {{13, 14}, {15, 16}}
+        } 
+    });
+
+    Matrix* M = affine_4d_forward(A, X);
+
+    const std::vector<std::vector<double>> ans = {
+        {23.8, 28.4, 33},
+        {59,     70, 81}
+    };
+
+    EXPECT_MATRIX_NEAR(ans, M);
+
+    Matrix* B =  create_matrix_from_stdvec({{0.1, 0.2, 0.3}, {0.4, 0.5, 0.6}});
+    Matrix4d* N = affine_4d_backward(A, B);
+
+    const std::vector<std::vector<std::vector<std::vector<double>>>> ans2 = {
+        {
+            {
+                {0.14, 0.32},
+                {0.5 , 0.68}
+            },
+            {
+                {0.14, 0.32},
+                {0.5 , 0.68}
+            }
+        },
+        {
+            {
+                {0.32, 0.77},
+                {1.22, 1.67}
+            },
+            {
+                {0.32, 0.77},
+                {1.22, 1.67}
+            }
+        }
+    };
+
+    EXPECT_MATRIX4D_EQ(ans2, N);
+
+    free_affine(A);
+    free_matrix_4d(X);
+    free_matrix(M);
+    free_matrix(B);
+    free_matrix_4d(N);
+}
+
+
 TEST(relu_forward_backward, success) {
     Relu* R = create_relu();
 

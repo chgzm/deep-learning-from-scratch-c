@@ -1,7 +1,13 @@
 #include "layer.h"
 #include "function.h"
+
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
+
+//
+// Affine
+//
 
 Affine* create_affine(Matrix* W, Vector* b) {
     Affine* A = malloc(sizeof(Affine));
@@ -10,6 +16,7 @@ Affine* create_affine(Matrix* W, Vector* b) {
     A->X  = NULL;
     A->dW = NULL;
     A->db = NULL;
+    memset(A->original_x_shape, 0, sizeof(int) * 4);
     return A;
 }
 
@@ -35,6 +42,31 @@ Matrix* affine_forward(Affine* A, const Matrix* X) {
             B->elements[i][j] += A->b->elements[j];
         }
     }
+    return B;
+}
+
+Matrix* affine_4d_forward(Affine* A, const Matrix4d* X) { 
+   for (int i = 0; i < 4; ++i) {
+        A->original_x_shape[i] = X->sizes[i];
+    }
+
+    Matrix* R = matrix_reshape_to_2d(X, X->sizes[0], -1);  
+
+    if (A->X != NULL) {
+        free_matrix(A->X);
+    }
+    A->X = create_matrix(R->rows, R->cols);
+    copy_matrix(A->X, R);
+
+    Matrix* B = dot_matrix(R, A->W);
+    for (int i = 0; i < B->rows; ++i) {
+        for (int j = 0; j < B->cols; ++j) {
+            B->elements[i][j] += A->b->elements[j];
+        }
+    }
+
+    free_matrix(R);
+
     return B;
 }
 
@@ -66,6 +98,43 @@ Matrix* affine_backward(Affine* A, const Matrix* D) {
     free_matrix(X_T);
     return dX;
 }
+
+Matrix4d* affine_4d_backward(Affine* A, const Matrix* D) { 
+    Matrix* W_T = transpose(A->W);
+    Matrix* X_T = transpose(A->X);
+
+    Matrix* dX = dot_matrix(D, W_T);
+    if (A->dW != NULL) {
+        free_matrix(A->dW);
+    }
+
+    A->dW = dot_matrix(X_T, D);
+
+    if (A->db != NULL) {
+        free_vector(A->db);
+    }
+    A->db = create_vector(D->cols);
+
+    for (int i = 0; i < D->cols; ++i) {
+        double sum = 0;
+        for (int j = 0; j < D->rows; ++j) {
+            sum += D->elements[j][i];
+        }
+        A->db->elements[i] = sum;
+    }
+
+    // reshape
+    Matrix4d* dXR = matrix_reshape_to_4d(dX, A->original_x_shape[0], A->original_x_shape[1], A->original_x_shape[2], A->original_x_shape[3]); 
+
+    free_matrix(dX);
+    free_matrix(W_T);
+    free_matrix(X_T);
+    return dXR;
+}
+
+//
+// Relu
+//
 
 static Mask* create_mask(int rows, int cols) {
     Mask* m     = malloc(sizeof(Mask));

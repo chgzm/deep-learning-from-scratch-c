@@ -9,8 +9,19 @@ struct Affine {
     Matrix* W;
     Vector* b;
     Matrix* X;
+    Matrix4d* X4d;
     Matrix* dW;
     Vector* db;
+    int original_x_shape[4];
+};
+
+typedef struct Affine4d Affine4d;
+struct Affine4d {
+    Matrix*   W;
+    Vector*   b;
+    Matrix4d* X;
+    Matrix*  dW;
+    Vector*  db;
 };
 
 typedef struct Mask Mask;
@@ -93,6 +104,8 @@ Affine* create_affine(Matrix* W, Vector* b);
 void free_affine(Affine* A);
 Matrix* affine_forward(Affine* A, const Matrix* X);
 Matrix* affine_backward(Affine* A, const Matrix* D);
+Matrix* affine_4d_forward(Affine* A, const Matrix4d* X);
+Matrix4d* affine_4d_backward(Affine* A, const Matrix* D);
 
 Relu* create_relu();
 void free_relu(Relu* R);
