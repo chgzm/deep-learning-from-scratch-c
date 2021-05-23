@@ -39,7 +39,7 @@ static double loss(TwoLayerNet* net, const Matrix* X, const Vector* t) {
     Matrix* Y = predict(net, X);
     const double v = softmax_with_loss_forward(net->S, Y, (Vector*)t); 
 
-    free(Y);
+    free_matrix(Y);
     return v;
 }
 
