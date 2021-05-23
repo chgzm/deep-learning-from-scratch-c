@@ -46,6 +46,116 @@ TEST(relu_forward_backward, success) {
     free_relu(R);
 }
 
+TEST(relu_4d_forward_backward, success) {
+    Relu4d* R = create_relu_4d();
+
+    Matrix4d* M = create_matrix4d_from_stdvec({
+        {
+            {{1, -1}, {-1, 1}}, 
+            {{2,  2}, { 2, 2}}, 
+            {{3,  3}, { 3, 3}}, 
+        }, 
+        {
+            {{4,  4}, {4,  4}}, 
+            {{5, -5}, {5, -5}},
+            {{6,  6}, {6,  6}}
+        }, 
+        {
+            {{7, 7}, {7, 7}}, 
+            {{8, 8}, {8, 8}},
+            {{9, 0}, {9, 0}}
+        }, 
+        {
+            {{-10, 10}, {10, 10}}, 
+            {{ 11, 11}, {11, 11}},
+            {{ 12, 12}, {12, 12}}
+        }
+    });
+    Matrix4d* A = relu_4d_forward(R, M);
+
+    const std::vector<std::vector<std::vector<std::vector<double>>>> ans = {
+        {
+            {{1,  0}, { 0, 1}}, 
+            {{2,  2}, { 2, 2}}, 
+            {{3,  3}, { 3, 3}}, 
+        }, 
+        {
+            {{4,  4}, {4,  4}}, 
+            {{5,  0}, {5,  0}},
+            {{6,  6}, {6,  6}}
+        }, 
+        {
+            {{7, 7}, {7, 7}}, 
+            {{8, 8}, {8, 8}},
+            {{9, 0}, {9, 0}}
+        }, 
+        {
+            {{  0, 10}, {10, 10}}, 
+            {{ 11, 11}, {11, 11}},
+            {{ 12, 12}, {12, 12}}
+        }
+    };
+    EXPECT_MATRIX4D_EQ(ans, A);
+    
+    // backward
+    Matrix4d* N = create_matrix4d_from_stdvec({
+        {
+            {{1,  1}, { 1, 1}}, 
+            {{1,  1}, { 1, 1}}, 
+            {{1,  1}, { 1, 1}}, 
+        }, 
+        {
+            {{1,  1}, { 1, 1}}, 
+            {{1,  1}, { 1, 1}}, 
+            {{1,  1}, { 1, 1}}, 
+        }, 
+ 
+        {
+            {{1,  1}, { 1, 1}}, 
+            {{1,  1}, { 1, 1}}, 
+            {{1,  1}, { 1, 1}}, 
+        }, 
+        {
+            {{1,  1}, { 1, 1}}, 
+            {{1,  1}, { 1, 1}}, 
+            {{1,  1}, { 1, 1}}, 
+        }, 
+    });
+    Matrix4d* B = relu_4d_backward(R, N);
+    
+    const std::vector<std::vector<std::vector<std::vector<double>>>> ans2 = {
+        {
+            {{1,  0}, { 0, 1}}, 
+            {{1,  1}, { 1, 1}}, 
+            {{1,  1}, { 1, 1}}, 
+        }, 
+        {
+            {{1,  1}, { 1, 1}}, 
+            {{1,  0}, { 1, 0}}, 
+            {{1,  1}, { 1, 1}}, 
+        }, 
+ 
+        {
+            {{1,  1}, { 1, 1}}, 
+            {{1,  1}, { 1, 1}}, 
+            {{1,  0}, { 1, 0}}, 
+        }, 
+        {
+            {{0,  1}, { 1, 1}}, 
+            {{1,  1}, { 1, 1}}, 
+            {{1,  1}, { 1, 1}}, 
+        }, 
+    };
+
+    EXPECT_MATRIX4D_EQ(ans2, B);
+
+    free_matrix_4d(M);
+    free_matrix_4d(N);
+    free_matrix_4d(A);
+    free_matrix_4d(B);
+    free_relu_4d(R);
+}
+
 TEST(softmax_with_loss_forward_backward, success) {
     SoftmaxWithLoss* S = create_softmax_with_loss();
     

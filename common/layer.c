@@ -134,6 +134,103 @@ Matrix* relu_backward(Relu* R, const Matrix* D) {
     return M;
 }
 
+//
+// Relu4d
+//
+
+static Mask4d* create_mask_4d(const int* sizes) {
+    Mask4d* m   = malloc(sizeof(Mask4d));
+    m->sizes[0] = sizes[0];
+    m->sizes[1] = sizes[1];
+    m->sizes[2] = sizes[2];
+    m->sizes[3] = sizes[3];
+    m->elements = calloc(sizes[0], sizeof(bool***));
+    for (int i = 0; i < sizes[0]; ++i) {
+        m->elements[i] = calloc(sizes[1], sizeof(bool**));
+        for (int j = 0; j < sizes[1]; ++j) {
+            m->elements[i][j] = calloc(sizes[2], sizeof(bool*));
+            for (int k = 0; k < sizes[2]; ++k) {
+                m->elements[i][j][k] = calloc(sizes[3], sizeof(bool));
+            }
+        }
+    }
+
+    return m;
+}
+
+static void free_mask_4d(Mask4d* m) {
+    for (int i = 0; i < m->sizes[0]; ++i) {
+        for (int j = 0; j < m->sizes[1]; ++j) {
+            for (int k = 0; k < m->sizes[2]; ++k) {
+                free(m->elements[i][j][k]);
+            }
+            free(m->elements[i][j]);
+        }
+        free(m->elements[i]);
+    }
+    free(m->elements);
+    free(m);
+}
+
+Relu4d* create_relu_4d() {
+    Relu4d* r = malloc(sizeof(Relu4d));
+    r->mask = NULL;
+    return r;
+}
+
+void free_relu_4d(Relu4d* R) {
+    free_mask_4d(R->mask);
+    free(R);
+}
+
+Matrix4d* relu_4d_forward(Relu4d* R, const Matrix4d* X) {
+    if (R->mask != NULL) {
+        free_mask_4d(R->mask);
+    }
+    R->mask = create_mask_4d(X->sizes);
+    Matrix4d* M = create_matrix_4d(X->sizes[0], X->sizes[1], X->sizes[2], X->sizes[3]);
+    for (int i = 0; i < M->sizes[0]; ++i) {
+        for (int j = 0; j < M->sizes[1]; ++j) {
+            for (int k = 0; k < M->sizes[2]; ++k) {
+                for (int l = 0; l < M->sizes[3]; ++l) {
+                    if (X->elements[i][j][k][l] <= 0) {
+                        R->mask->elements[i][j][k][l] = true;
+                        M->elements[i][j][k][l] = 0;
+                    } else {
+                        R->mask->elements[i][j][k][l] = false;
+                        M->elements[i][j][k][l] = X->elements[i][j][k][l];
+                    }
+                }
+            }
+        }
+    }
+
+    return M;
+}
+
+Matrix4d* relu_4d_backward(Relu4d* R, const Matrix4d* D) {
+    Matrix4d* M = create_matrix_4d(D->sizes[0], D->sizes[1], D->sizes[2], D->sizes[3]);
+    for (int i = 0; i < M->sizes[0]; ++i) {
+        for (int j = 0; j < M->sizes[1]; ++j) {
+            for (int k = 0; k < M->sizes[2]; ++k) {
+                for (int l = 0; l < M->sizes[3]; ++l) {
+                    if (R->mask->elements[i][j][k][l]) {
+                        M->elements[i][j][k][l] = 0;
+                    } else {
+                        M->elements[i][j][k][l] = D->elements[i][j][k][l];
+                    }
+                }
+            }
+        }
+    }
+
+    return M;
+}
+
+//
+// SoftmaxWithLoss
+//
+
 SoftmaxWithLoss* create_softmax_with_loss() {
     SoftmaxWithLoss* sft = calloc(1, sizeof(SoftmaxWithLoss));
     return sft;

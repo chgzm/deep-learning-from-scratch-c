@@ -25,6 +25,17 @@ struct Relu {
     Mask* mask;
 };
 
+typedef struct Mask4d Mask4d;
+struct Mask4d {
+    int sizes[4];
+    bool**** elements;
+};
+
+typedef struct Relu4d Relu4d;
+struct Relu4d {
+    Mask4d* mask;
+};
+
 typedef struct SoftmaxWithLoss SoftmaxWithLoss;
 struct SoftmaxWithLoss {
     double  loss;
@@ -87,6 +98,11 @@ Relu* create_relu();
 void free_relu(Relu* R);
 Matrix* relu_forward(Relu* R, const Matrix* X);
 Matrix* relu_backward(Relu* R, const Matrix* D);
+
+Relu4d* create_relu_4d();
+void free_relu_4d(Relu4d* R);
+Matrix4d* relu_4d_forward(Relu4d* R, const Matrix4d* X);
+Matrix4d* relu_4d_backward(Relu4d* R, const Matrix4d* D);
 
 SoftmaxWithLoss* create_softmax_with_loss();
 void free_softmax_with_loss(SoftmaxWithLoss* S);
