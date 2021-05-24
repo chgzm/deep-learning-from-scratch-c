@@ -133,7 +133,7 @@ double multi_layer_net_loss(MultiLayerNet* net, const Matrix* X, const Vector* t
         free_matrix(tmp);
     }
 
-    free(Y);
+    free_matrix(Y);
     return v + weight_decay;
 }
 
