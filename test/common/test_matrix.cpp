@@ -1780,11 +1780,15 @@ TEST(create_image_batch, success) {
 }
 
 TEST(create_image_batch_4d, success) {
-    double** images = (double**)malloc(sizeof(double*) * 5);
+    double**** images = (double****)malloc(sizeof(double***) * 5);
     for (int i = 0; i < 5; ++i) {
-        images[i] = (double*)malloc(sizeof(double) * NUM_OF_PIXELS);
-        for (int j = 0; j < NUM_OF_PIXELS; ++j) {
-            images[i][j] = (i + 1) * j; 
+        images[i] = (double***)malloc(sizeof(double**));
+        images[i][0] = (double**)malloc(sizeof(double*) * NUM_OF_ROWS);
+        for (int j = 0; j < NUM_OF_ROWS; ++j) {
+            images[i][0][j] = (double*)malloc(sizeof(double) * NUM_OF_COLS);
+            for (int k = 0; k < NUM_OF_COLS; ++k) {
+                images[i][0][j][k] = (i + 1) * (j * NUM_OF_ROWS + k);
+            }
         }
     }
     int batch_index[] = {2, 3, 4};

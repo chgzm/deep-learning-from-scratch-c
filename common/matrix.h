@@ -97,7 +97,7 @@ Matrix4d* matrix_4d_pad(const Matrix4d* M, int pad);
 //
 
 Matrix* create_image_batch(double** images, const int* batch_index, int size);
-Matrix4d* create_image_batch_4d(double** images, const int* batch_index, int size);
+Matrix4d* create_image_batch_4d(double**** images, const int* batch_index, int size);
 Vector* create_label_batch(uint8_t* labels, const int* batch_index, int size);
 
 //

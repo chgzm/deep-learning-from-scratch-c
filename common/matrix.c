@@ -800,12 +800,12 @@ Matrix* create_image_batch(double** images, const int* batch_index, int size) {
     return M;
 }
 
-Matrix4d* create_image_batch_4d(double** images, const int* batch_index, int size) {
+Matrix4d* create_image_batch_4d(double**** images, const int* batch_index, int size) {
     Matrix4d* M = create_matrix_4d(size, 1, NUM_OF_ROWS, NUM_OF_COLS);
     for (int i = 0; i < size; ++i) {
         for (int j = 0; j < NUM_OF_ROWS; ++j) {
             for (int k = 0; k < NUM_OF_COLS; ++k) {
-                M->elements[i][0][j][k] = images[batch_index[i]][j * NUM_OF_ROWS + k];
+                M->elements[i][0][j][k] = images[batch_index[i]][0][j][k];
             }
         }
     }
