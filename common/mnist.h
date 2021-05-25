@@ -12,6 +12,7 @@
 #define NUM_OF_TEST_IMAGES  10000
 
 double** load_mnist_images(const char* file_path);
+double**** load_mnist_images_4d(const char* file_path);
 uint8_t* load_mnist_labels(const char* file_path);
 
 #endif

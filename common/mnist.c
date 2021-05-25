@@ -49,6 +49,55 @@ double** load_mnist_images(const char* file_path) {
     return imgs;
 }
 
+double**** load_mnist_images_4d(const char* file_path) {
+    uint8_t* addr = read_file(file_path);
+    if (addr == NULL) {
+        fprintf(stderr, "Failed to read file=\"%s\"\n", file_path);
+        return NULL;
+    }
+
+    int pos = 0;
+    const int magic = read_int32(addr, &pos);
+    if (magic != IMAGE_MAGIC) {
+        fprintf(stderr, "Invalid magic=0x%08x\n", magic);
+        return NULL;
+    }
+
+    const int num_of_images = read_int32(addr, &pos);
+    if (num_of_images != 10000 && num_of_images != 60000) {
+        fprintf(stderr, "Invalid number of images=%d\n", num_of_images);
+        return NULL;
+    }
+
+    const int num_of_rows = read_int32(addr, &pos);
+    if (num_of_rows != NUM_OF_ROWS) {
+        fprintf(stderr, "Invalid number of rows=%d\n", num_of_rows);
+        return NULL;
+    }
+
+    const int num_of_cols = read_int32(addr, &pos);
+    if (num_of_cols != NUM_OF_COLS) {
+        fprintf(stderr, "Invalid number of cols=%d\n", num_of_cols);
+        return NULL;
+    }
+
+    double**** imgs = malloc(sizeof(double***) * num_of_images);  
+    for (int i = 0; i < num_of_images; ++i) {
+        imgs[i] = malloc(sizeof(double**));
+        imgs[i][0] = malloc(sizeof(double*) * NUM_OF_ROWS);
+        for (int j = 0; j < NUM_OF_ROWS; ++j) {
+            imgs[i][0][j] = malloc(sizeof(double) * NUM_OF_COLS);
+            for (int k = 0; k < NUM_OF_COLS; ++k) {
+                const uint8_t d = read_uint8(addr, &pos);      
+                imgs[i][0][j][k] = d / 255.0;
+            }
+        }
+    }
+
+    free(addr);
+    return imgs;
+}
+
 uint8_t* load_mnist_labels(const char* file_path) {
     uint8_t* addr = read_file(file_path);
     if (addr == NULL) {
