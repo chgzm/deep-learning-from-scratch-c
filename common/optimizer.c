@@ -24,6 +24,18 @@ void SGD_update_matrix(Matrix* A, const Matrix* dA, double lr) {
     }
 }
 
+void SGD_update_matrix_4d(Matrix4d* A, const Matrix4d* dA, double lr) {
+    for (int i = 0; i < A->sizes[0]; ++i) {
+        for (int j = 0; j < A->sizes[1]; ++j) {
+            for (int k = 0; k < A->sizes[2]; ++k) {
+                for (int l = 0; l < A->sizes[3]; ++l) {
+                    SGD_update(&(A->elements[i][j][k][l]), dA->elements[i][j][k][l], lr);
+                }
+            }
+        }
+    }
+}
+
 //
 // Momentum
 //
@@ -93,6 +105,18 @@ void Adam_update_matrix(Matrix* A, const Matrix* dA, double lr, double beta1, do
     for (int i = 0; i < A->rows; ++i) {
         for (int j = 0; j < A->cols; ++j) {
             Adam_update(&(A->elements[i][j]), dA->elements[i][j], lr, beta1, beta2, &(m->elements[i][j]), &(v->elements[i][j]), iter); 
+        }
+    } 
+}
+
+void Adam_update_matrix_4d(Matrix4d* A, const Matrix4d* dA, double lr, double beta1, double beta2, Matrix4d* m, Matrix4d* v, int iter) {
+    for (int i = 0; i < A->sizes[0]; ++i) {
+        for (int j = 0; j < A->sizes[1]; ++j) {
+            for (int k = 0; k < A->sizes[2]; ++k) {
+                for (int l = 0; l < A->sizes[3]; ++l) {
+                    Adam_update(&(A->elements[i][j][k][l]), dA->elements[i][j][k][l], lr, beta1, beta2, &(m->elements[i][j][k][l]), &(v->elements[i][j][k][l]), iter); 
+                }
+            }
         }
     } 
 }
