@@ -315,6 +315,11 @@ static void simple_convnet_trainer_train_step(SimpleConvNetTrainer* trainer, int
     }
     }
 
+    if (trainer->verbose) {
+        const double loss = simple_convnet_loss(trainer->net, x_batch, t_batch);
+        printf("train loss:%lf\n", loss); 
+    }
+
     if (trainer->current_iter % trainer->iter_per_epoch == 0) {
         const double train_acc = simple_convnet_accuracy(trainer->net, trainer->train_images, trainer->train_labels, trainer->train_size, 1);
         const double test_acc  = simple_convnet_accuracy(trainer->net, trainer->test_images,  trainer->test_labels, trainer->test_size, 1);
@@ -365,7 +370,6 @@ void simple_convnet_trainer_train(SimpleConvNetTrainer* trainer) {
     }
 
     for (int i = 0; i < trainer->max_iter; ++i) {
-        printf("Train: i = %d / %d\n", i, trainer->max_iter);
         simple_convnet_trainer_train_step(trainer, i);
     }
 

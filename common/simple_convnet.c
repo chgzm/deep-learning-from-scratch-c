@@ -87,7 +87,6 @@ static Matrix* predict(const SimpleConvNet* net, Matrix4d* X) {
 double simple_convnet_loss(SimpleConvNet* net, Matrix4d* X, const Vector* t) {
     Matrix* Y = predict(net, X);
     const double v = softmax_with_loss_forward(net->S, Y, t); 
-    printf("loss=%lf\n", v);
 
     free_matrix(Y);
     return v;
