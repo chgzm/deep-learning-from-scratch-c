@@ -113,6 +113,34 @@ int init_matrix_from_file(Matrix* M, const char* file_path) {
     return 0;
 }
 
+int init_matrix_4d_from_file(Matrix4d* M, const char* file_path) {
+    FILE* fp = fopen(file_path, "r");
+    if (fp == NULL) {
+        fprintf(stderr, "Failed to open \"%s\".\n", file_path);
+        return -1;
+    }    
+
+    double d;
+    for (int i = 0; i < M->sizes[0]; ++i) {
+        for (int j = 0; j < M->sizes[1]; ++j) {
+            for (int k = 0; k < M->sizes[2]; ++k) {
+                for (int l = 0; l < M->sizes[3]; ++l) {
+                    const int r = fscanf(fp, "%lf", &d);
+                    if (r != 1) {
+                        fprintf(stderr, "fscanf failed.\n");
+                        fclose(fp);
+                        return -1;
+                    }
+                    M->elements[i][j][k][l] = d;
+                }
+            }
+        }
+    }
+
+    fclose(fp);
+    return 0;
+}
+
 void copy_matrix(Matrix* dst, const Matrix* src) {
     for (int i = 0; i < src->rows; ++i) {
         for (int j = 0; j < src->cols; ++j) {

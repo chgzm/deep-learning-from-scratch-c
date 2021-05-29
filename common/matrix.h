@@ -38,6 +38,7 @@ Matrix4d* create_matrix_4d(int s1, int s2, int s3, int s4);
 int init_vector_from_file(Vector* v, const char* file_path);
 void init_vector_from_array(Vector* v, double* vals);
 int init_matrix_from_file(Matrix* M, const char* file_path);
+int init_matrix_4d_from_file(Matrix4d* M, const char* file_path);
 void init_matrix_random(Matrix* M);
 void init_matrix_4d_random(Matrix4d* M);
 void init_matrix_rand(Matrix* M);

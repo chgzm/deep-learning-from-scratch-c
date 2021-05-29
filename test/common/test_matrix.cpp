@@ -93,6 +93,30 @@ TEST(init_matrix_from_file, success) {
     free_matrix(M);
 }
 
+TEST(init_matrix_4d_from_file, success) {
+    Matrix4d* M = create_matrix_4d(2, 4, 2, 2);
+    EXPECT_EQ(0, init_matrix_4d_from_file(M, "./data/W4d.csv"));
+
+    std::vector<std::vector<std::vector<std::vector<double>>>> ans = {  
+       {
+            {{1,   2}, {3,   4}}, 
+            {{5,   6}, {7,   8}},
+            {{9,  10}, {11, 12}},
+            {{13, 14}, {15, 16}}
+       }, 
+       {
+            {{1,   2}, {3,   4}}, 
+            {{5,   6}, {7,   8}},
+            {{9,  10}, {11, 12}},
+            {{13, 14}, {15, 16}}
+       }
+    };
+
+    EXPECT_MATRIX4D_EQ(ans, M);
+
+    free_matrix_4d(M);
+}
+
 TEST(copy_vector, success) {
     Vector* v = create_vector(50);
     EXPECT_EQ(0, init_vector_from_file(v, "../../dataset/b1.csv"));
