@@ -522,31 +522,36 @@ void free_dropout(Dropout* D) {
     free(D);
 }
 
-Matrix* dropout_forward(Dropout* D, const Matrix* X) {
-    if (D->mask != NULL) {
-        free_mask(D->mask);
-    }
+Matrix* dropout_forward(Dropout* D, const Matrix* X, bool train_flag) {
+    if (train_flag) {
+        if (D->mask != NULL) {
+            free_mask(D->mask);
+        }
 
-    Matrix* RND = create_matrix(X->rows, X->cols);
-    init_matrix_rand(RND);
-    Matrix* M = create_matrix(X->rows, X->cols);
-    D->mask = create_mask(X->rows, X->cols);
+        Matrix* RND = create_matrix(X->rows, X->cols);
+        init_matrix_rand(RND);
+        Matrix* M = create_matrix(X->rows, X->cols);
+        D->mask = create_mask(X->rows, X->cols);
 
-    for (int i = 0; i < M->rows; ++i) {
-        for (int j = 0; j < M->cols; ++j) {
-            if (RND->elements[i][j] > D->dropout_ratio) {
-                D->mask->elements[i][j] = true;
-                M->elements[i][j] = X->elements[i][j];
-            } else {
-                D->mask->elements[i][j] = false;
-                M->elements[i][j] = 0;
+        for (int i = 0; i < M->rows; ++i) {
+            for (int j = 0; j < M->cols; ++j) {
+                if (RND->elements[i][j] > D->dropout_ratio) {
+                    D->mask->elements[i][j] = true;
+                    M->elements[i][j] = X->elements[i][j];
+                } else {
+                    D->mask->elements[i][j] = false;
+                    M->elements[i][j] = 0;
+                }
             }
         }
+
+        free_matrix(RND);
+
+        return M;
+    } else {
+        Matrix* M = _scalar_matrix(X, 1.0 - D->dropout_ratio);
+        return M;
     }
-
-    free_matrix(RND);
-
-    return M;
 }
 
 Matrix* dropout_backward(const Dropout* D, const Matrix* X) {

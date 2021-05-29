@@ -270,7 +270,7 @@ TEST(dropout_forward_backward, success) {
     Matrix* X = create_matrix_from_stdvec({{1, 3, 2, 4}, {8, 6, 7, 5}, {10, 9, 11, 12}});
 
     std::vector<int> zero_index;
-    Matrix* M = dropout_forward(D, X);
+    Matrix* M = dropout_forward(D, X, true);
     Matrix* N = dropout_backward(D, X);
 
     free_dropout(D);

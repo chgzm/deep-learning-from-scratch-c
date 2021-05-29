@@ -124,7 +124,7 @@ static Matrix* predict(const MultiLayerNetExtend* net, const Matrix* X) {
 
             if (net->use_dropout) {
                 Matrix* X3 = X_tmp;
-                X_tmp = dropout_forward(net->D[i], X3);
+                X_tmp = dropout_forward(net->D[i], X3, true);
                 free_matrix(X3);
             }
 

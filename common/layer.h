@@ -129,7 +129,7 @@ Matrix* batch_normalization_backward(BatchNormalization* B, const Matrix* D);
 
 Dropout* create_dropout(double dropout_ratio);
 void free_dropout(Dropout* D);
-Matrix* dropout_forward(Dropout* D, const Matrix* X);
+Matrix* dropout_forward(Dropout* D, const Matrix* X, bool train_flg);
 Matrix* dropout_backward(const Dropout* D, const Matrix* X);
 
 Convolution* create_convolution(Matrix4d* W, Vector* b, int stride, int pad);
