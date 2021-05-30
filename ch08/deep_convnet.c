@@ -17,43 +17,45 @@ DeepConvNet* create_deep_convnet(int* input_dim, ConvParam* params, int hidden_s
         weight_init_scales[i] = sqrt(2.0 / pre_node_nums[i]);
     }
 
+    // Convolution - Relu
     int pre_channel_num = input_dim[0];
     for (int i = 0; i < 6; ++i) {
-        net->W4d[i] = create_matrix_4d(params[i].filter_num, pre_channel_num, params[i].filter_size, params[i].filter_size);
-        init_matrix_4d_random(net->W4d[i]); 
-        scalar_matrix_4d(net->W4d[i], weight_init_scales[i]);
-        net->b[i] = create_vector(params[i].filter_num);
+        Matrix4d* W4d = create_matrix_4d(params[i].filter_num, pre_channel_num, params[i].filter_size, params[i].filter_size);
+        init_matrix_4d_random(W4d);
+        scalar_matrix_4d(W4d, weight_init_scales[i]);
+        Vector* b = create_vector(params[i].filter_num);
         pre_channel_num = params[i].filter_num;
 
-        net->C[i] = create_convolution(net->W4d[i], net->b[i], params[i].stride, params[i].pad);
+        net->C[i] = create_convolution(W4d, b, params[i].stride, params[i].pad);
         net->R4d[i] = create_relu_4d();
     }
 
     // Pooling
-    for (int i = 0; i < 3; ++i) {
-        net->P[i] = create_pooling(2, 2, 2, 0);
-    }
+    net->P[0] = create_pooling(2, 2, 2, 0);
+    net->P[1] = create_pooling(2, 2, 2, 0);
+    net->P[2] = create_pooling(2, 2, 2, 0);
 
-    // Affine
-    net->W[0] = create_matrix(64*4*4, hidden_size);
-    init_matrix_random(net->W[0]);
-    scalar_matrix(net->W[0], weight_init_scales[6]);
-    net->b[6] = create_vector(hidden_size);
-    net->A[0] = create_affine(net->W[0], net->b[6]);
+    // Affine 
+    Matrix* W0 = create_matrix(64*4*4, hidden_size);
+    init_matrix_random(W0);
+    scalar_matrix(W0, weight_init_scales[6]);
+    Vector* b0 = create_vector(hidden_size);
+    net->A[0] = create_affine(W0, b0);
   
-    net->W[1] = create_matrix(hidden_size, output_size);
-    init_matrix_random(net->W[1]);
-    scalar_matrix(net->W[1], weight_init_scales[7]);
-    net->b[7] = create_vector(output_size);
-    net->A[1] = create_affine(net->W[1], net->b[7]);
+    Matrix* W1 = create_matrix(hidden_size, output_size);
+    init_matrix_random(W1);
+    scalar_matrix(W1, weight_init_scales[7]);
+    Vector* b2 = create_vector(output_size);
+    net->A[1] = create_affine(W1, b2);
     
+    // Relu
     net->R = create_relu();
 
     // Dropout
-    for (int i = 0; i < 2; ++i) {
-        net->D[i] = create_dropout(0.5);
-    }
+    net->D[0] = create_dropout(0.5);
+    net->D[1] = create_dropout(0.5);
 
+    // SoftmaxWithLoss
     net->S = create_softmax_with_loss();
 
     return net;
@@ -81,22 +83,23 @@ void free_deep_convnet(DeepConvNet* net) {
 }
 
 int deep_convnet_load_params(DeepConvNet* net) {
-    if (init_matrix_4d_from_file(net->W4d[0], "./data/W1.csv")) { fprintf(stderr, "Failed to load ./data/W1.csv\n"); }
-    if (init_matrix_4d_from_file(net->W4d[1], "./data/W2.csv")) { fprintf(stderr, "Failed to load ./data/W1.csv\n"); }
-    if (init_matrix_4d_from_file(net->W4d[2], "./data/W3.csv")) { fprintf(stderr, "Failed to load ./data/W1.csv\n"); }
-    if (init_matrix_4d_from_file(net->W4d[3], "./data/W4.csv")) { fprintf(stderr, "Failed to load ./data/W1.csv\n"); }
-    if (init_matrix_4d_from_file(net->W4d[4], "./data/W5.csv")) { fprintf(stderr, "Failed to load ./data/W1.csv\n"); }
-    if (init_matrix_4d_from_file(net->W4d[5], "./data/W6.csv")) { fprintf(stderr, "Failed to load ./data/W1.csv\n"); }
-    if (init_matrix_from_file(net->W[0], "./data/W7.csv")     ) { fprintf(stderr, "Failed to load ./data/W1.csv\n"); }
-    if (init_matrix_from_file(net->W[1], "./data/W8.csv")     ) { fprintf(stderr, "Failed to load ./data/W1.csv\n"); }
-    if (init_vector_from_file(net->b[0],  "./data/b1.csv")    ) { fprintf(stderr, "Failed to load ./data/W1.csv\n"); }
-    if (init_vector_from_file(net->b[1],  "./data/b2.csv")    ) { fprintf(stderr, "Failed to load ./data/W1.csv\n"); }
-    if (init_vector_from_file(net->b[2],  "./data/b3.csv")    ) { fprintf(stderr, "Failed to load ./data/W1.csv\n"); }
-    if (init_vector_from_file(net->b[3],  "./data/b4.csv")    ) { fprintf(stderr, "Failed to load ./data/W1.csv\n"); }
-    if (init_vector_from_file(net->b[4],  "./data/b5.csv")    ) { fprintf(stderr, "Failed to load ./data/W1.csv\n"); }
-    if (init_vector_from_file(net->b[5],  "./data/b6.csv")    ) { fprintf(stderr, "Failed to load ./data/W1.csv\n"); }
-    if (init_vector_from_file(net->b[6],  "./data/b7.csv")    ) { fprintf(stderr, "Failed to load ./data/W1.csv\n"); }
-    if (init_vector_from_file(net->b[7],  "./data/b8.csv")    ) { fprintf(stderr, "Failed to load ./data/W1.csv\n"); }
+    if (init_matrix_4d_from_file(net->C[0]->W, "./data/W1.csv")) { fprintf(stderr, "Failed to load ./data/W1.csv\n"); }
+    if (init_matrix_4d_from_file(net->C[1]->W, "./data/W2.csv")) { fprintf(stderr, "Failed to load ./data/W2.csv\n"); }
+    if (init_matrix_4d_from_file(net->C[2]->W, "./data/W3.csv")) { fprintf(stderr, "Failed to load ./data/W3.csv\n"); }
+    if (init_matrix_4d_from_file(net->C[3]->W, "./data/W4.csv")) { fprintf(stderr, "Failed to load ./data/W4.csv\n"); }
+    if (init_matrix_4d_from_file(net->C[4]->W, "./data/W5.csv")) { fprintf(stderr, "Failed to load ./data/W5.csv\n"); }
+    if (init_matrix_4d_from_file(net->C[5]->W, "./data/W6.csv")) { fprintf(stderr, "Failed to load ./data/W6.csv\n"); }
+    if (init_matrix_from_file(net->A[0]->W,    "./data/W7.csv")) { fprintf(stderr, "Failed to load ./data/W7.csv\n"); }
+    if (init_matrix_from_file(net->A[1]->W,    "./data/W8.csv")) { fprintf(stderr, "Failed to load ./data/W8.csv\n"); }
+
+    if (init_vector_from_file(net->C[0]->b,    "./data/b1.csv")) { fprintf(stderr, "Failed to load ./data/b1.csv\n"); }
+    if (init_vector_from_file(net->C[1]->b,    "./data/b2.csv")) { fprintf(stderr, "Failed to load ./data/b2.csv\n"); }
+    if (init_vector_from_file(net->C[2]->b,    "./data/b3.csv")) { fprintf(stderr, "Failed to load ./data/b3.csv\n"); }
+    if (init_vector_from_file(net->C[3]->b,    "./data/b4.csv")) { fprintf(stderr, "Failed to load ./data/b4.csv\n"); }
+    if (init_vector_from_file(net->C[4]->b,    "./data/b5.csv")) { fprintf(stderr, "Failed to load ./data/b5.csv\n"); }
+    if (init_vector_from_file(net->C[5]->b,    "./data/b6.csv")) { fprintf(stderr, "Failed to load ./data/b6.csv\n"); }
+    if (init_vector_from_file(net->A[0]->b,    "./data/b7.csv")) { fprintf(stderr, "Failed to load ./data/b7.csv\n"); }
+    if (init_vector_from_file(net->A[1]->b,    "./data/b8.csv")) { fprintf(stderr, "Failed to load ./data/b8.csv\n"); }
 
     return 0; 
 }

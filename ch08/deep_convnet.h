@@ -21,9 +21,6 @@ struct DeepConvNet {
     Relu* R;
     Dropout* D[2];
     SoftmaxWithLoss* S;
-    Matrix4d* W4d[6]; 
-    Matrix* W[2];
-    Vector* b[8]; 
 };
 
 DeepConvNet* create_deep_convnet(int* intput_dim, ConvParam* params, int hidden_size, int output_size); 
