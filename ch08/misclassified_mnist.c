@@ -10,6 +10,7 @@
 #include "deep_convnet.h"
 
 static const int BATCH_SIZE = 100;
+static const int MAX_VIEW = 20;
 
 static int _argmax(const double* v, int size) {
     int index = 0;
@@ -22,6 +23,45 @@ static int _argmax(const double* v, int size) {
     }
 
     return index;
+}
+
+static int plot_missclassified(int* miss_index, double**** test_images) {
+    FILE* gp = popen("gnuplot -persist", "w");
+    if (gp == NULL) {
+        fprintf(stderr, "Failed to open gnuplot pipe.\n");
+        return -1;
+    }
+
+    const int cols = 5;
+    const int rows = MAX_VIEW / cols;
+
+    fprintf(gp, "set term qt size 1600, 1200\n");
+    fprintf(gp, "set palette defined (0 'black', 1 'white')\n");
+    fprintf(gp, "unset colorbox\n");
+    fprintf(gp, "unset key\n");
+    fprintf(gp, "unset tics\n");
+    fprintf(gp, "set palette grey\n");
+    fprintf(gp, "set multiplot layout %d, %d\n", rows, cols);
+    fprintf(gp, "set yrange [] reverse\n");
+    for (int i = 0; i < MAX_VIEW; ++i) {
+        fprintf(gp, "set size %.2lf, %.2lf\n", 1.0 / rows, 1.0 / cols);
+        fprintf(gp, "plot '-' matrix with image\n");
+        double** img = test_images[miss_index[i]][0];
+        for (int j = 0; j < NUM_OF_ROWS; ++j) {
+            for (int k = 0; k < NUM_OF_ROWS; ++k) {
+                fprintf(gp, "%lf ", img[j][k]);
+            }
+            fprintf(gp, "\n");
+        }
+        fprintf(gp, "e\n");
+        fprintf(gp, "e\n");
+        fflush(gp);
+    }
+
+    fflush(gp);
+    pclose(gp);
+
+    return 0;
 }
 
 int main() {
@@ -51,8 +91,9 @@ int main() {
     DeepConvNet* net = create_deep_convnet(input_dim, conv_param, 50, 10); 
     deep_convnet_load_params(net);
 
-    int pos = 0;
-    int miss_index[20] = {-1};
+    int miss_cnt = 0;
+    int miss_index[MAX_VIEW];
+    uint8_t miss_inference[MAX_VIEW];
     int acc = 0;
     printf("calculating test accuracy ... \n");
     for (int i = 0; i < (NUM_OF_TEST_IMAGES / BATCH_SIZE); ++i) {
@@ -69,9 +110,11 @@ int main() {
             const int max_index = _argmax(Y->elements[j], Y->cols);
             if (max_index == test_labels[i * BATCH_SIZE + j]) {
                 ++acc;
-            } else if (pos < 20) {
-                miss_index[pos++] = i * BATCH_SIZE + j;  
-            }
+            } else if (miss_cnt < MAX_VIEW) {
+                miss_index[miss_cnt] = i * BATCH_SIZE + j;  
+                miss_inference[miss_cnt] = max_index;
+                ++miss_cnt;
+            } 
         }
 
         free_matrix_4d(x_batch);
@@ -81,9 +124,23 @@ int main() {
 
     printf("test accuracy:%lf\n", (double)acc / NUM_OF_TEST_IMAGES);
 
-    for (int i = 0; i < 20; ++i) {
-        printf("miss_index[%d] = %d\n", i, miss_index[i]);
+    printf("======= misclassified result =======\n");
+    printf("{view index: (label, inference), ...}\n");
+    for (int i = 0; i < miss_cnt; ++i) {
+        if (i == 0) {
+            printf("{");
+        } else {
+            printf(", ");
+        }
+
+        printf("%d: (%d, %d)", i + 1, test_labels[miss_index[i]], miss_inference[i]);
+
+        if (i == (miss_cnt - 1)) {
+            printf("}\n");
+        }
     }
+
+    plot_missclassified(miss_index, test_images);
 
     return 0;
 }
