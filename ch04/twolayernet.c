@@ -1,6 +1,8 @@
 #include "twolayernet.h"
+
 #include <function.h>
 #include <mnist.h>
+
 #include <stdlib.h>
 #include <math.h>
 
@@ -11,6 +13,11 @@ TwoLayerNet* create_two_layer_net(int input_size, int hidden_size, int output_si
     net->b1 = create_vector(hidden_size);
     net->W2 = create_matrix(hidden_size, output_size);
     net->b2 = create_vector(output_size);
+
+    net->dW1 = NULL;
+    net->db1 = NULL;
+    net->dW2 = NULL;
+    net->db2 = NULL;
 
     init_matrix_random(net->W1);
     scalar_matrix(net->W1, 0.01);
@@ -111,35 +118,11 @@ static Vector* numerical_gradient_vector(TwoLayerNet* net, Vector* v, const Matr
     return dv;
 }
 
-static void update_matrix(Matrix* A, const Matrix* dA) {
-    for (int i = 0; i < A->rows; ++i) {
-        for (int j = 0; j < A->cols; ++j) {
-            A->elements[i][j] -= (dA->elements[i][j] * LEARNING_RATE);
-        }
-    }
-}
-
-static void update_vector(Vector* v, const Vector* dv) {
-    for (int i = 0; i < v->size; ++i) {
-        v->elements[i] -= (dv->elements[i] * LEARNING_RATE);
-    }
-}
-
 void numerical_gradient(TwoLayerNet* net, const Matrix* X, const Vector* t) {
-    Matrix* dW1 = numerical_gradient_matrix(net, net->W1, X, t);         
-    Vector* db1 = numerical_gradient_vector(net, net->b1, X, t);         
-    Matrix* dW2 = numerical_gradient_matrix(net, net->W2, X, t);         
-    Vector* db2 = numerical_gradient_vector(net, net->b2, X, t);         
-
-    update_matrix(net->W1, dW1);
-    update_vector(net->b1, db1);
-    update_matrix(net->W2, dW2);
-    update_vector(net->b2, db2);
-
-    free_matrix(dW1);
-    free_vector(db1);
-    free_matrix(dW2);
-    free_vector(db2);
+    net->dW1 = numerical_gradient_matrix(net, net->W1, X, t);         
+    net->db1 = numerical_gradient_vector(net, net->b1, X, t);         
+    net->dW2 = numerical_gradient_matrix(net, net->W2, X, t);         
+    net->db2 = numerical_gradient_vector(net, net->b2, X, t);         
 }
 
 void two_layer_net_gradient(TwoLayerNet* net, const Matrix* X, const Vector* t) {
@@ -180,16 +163,16 @@ void two_layer_net_gradient(TwoLayerNet* net, const Matrix* X, const Vector* t) 
 
     // dW2
     Matrix* Z1_T = transpose(Z1);
-    Matrix* dW2 = dot_matrix(Z1_T, dY);
+    net->dW2 = dot_matrix(Z1_T, dY);
 
     // db2
-    Vector* db2 = create_vector(net->b2->size);
+    net->db2 = create_vector(net->b2->size);
     for (int i = 0; i < dY->cols; ++i) {
         double sum = 0;
         for (int j = 0; j < dY->rows; ++j) {
             sum += dY->elements[j][i];
         }
-        db2->elements[i] = sum;
+        net->db2->elements[i] = sum;
     }
 
     Matrix* W2_T = transpose(net->W2);
@@ -204,37 +187,28 @@ void two_layer_net_gradient(TwoLayerNet* net, const Matrix* X, const Vector* t) 
 
     // dW1
     Matrix* X_T = transpose(X);
-    Matrix* dW1 = dot_matrix(X_T, dA1);
+    net->dW1 = dot_matrix(X_T, dA1);
 
     // db1
-    Vector* db1 = create_vector(net->b1->size);
+    net->db1 = create_vector(net->b1->size);
     for (int i = 0; i < dA1->cols; ++i) {
         double sum = 0;
         for (int j = 0; j < dA1->rows; ++j) {
             sum += dA1->elements[j][i];
         }
-        db1->elements[i] = sum;
+        net->db1->elements[i] = sum;
     }
    
-    update_matrix(net->W1, dW1);
-    update_vector(net->b1, db1);
-    update_matrix(net->W2, dW2);
-    update_vector(net->b2, db2);
-
     free_matrix(A1);
     free_matrix(Z1);
     free_matrix(A2);
     free_matrix(Y);
     free_matrix(dY);
     free_matrix(Z1_T);
-    free_matrix(dW2);
-    free_vector(db2);
     free_matrix(W2_T);
     free_matrix(dZ1);
     free_matrix(dA1);
     free_matrix(X_T);
-    free_matrix(dW1);
-    free_vector(db1);
 }
 
 double two_layer_net_accuracy(const TwoLayerNet* net, double** images, uint8_t* labels, int size) {

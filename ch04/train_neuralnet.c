@@ -1,14 +1,42 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+
 #include <util.h>
 #include <mnist.h>
 #include <matrix.h>
 #include <function.h>
 #include "twolayernet.h"
 
-#define ITERS_NUM  10000
-#define BATCH_SIZE 100
+static const int ITERS_NUM = 10000;
+static const int BATCH_SIZE = 100;
+static const double LEARNING_RATE = 0.1;
+
+static void update_matrix(Matrix* A, const Matrix* dA) {
+    for (int i = 0; i < A->rows; ++i) {
+        for (int j = 0; j < A->cols; ++j) {
+            A->elements[i][j] -= (dA->elements[i][j] * LEARNING_RATE);
+        }
+    }
+}
+
+static void update_vector(Vector* v, const Vector* dv) {
+    for (int i = 0; i < v->size; ++i) {
+        v->elements[i] -= (dv->elements[i] * LEARNING_RATE);
+    }
+}
+
+static void update_weight(TwoLayerNet* net) {
+    update_matrix(net->W1, net->dW1);
+    update_vector(net->b1, net->db1);
+    update_matrix(net->W2, net->dW2);
+    update_vector(net->b2, net->db2);
+
+    free_matrix(net->dW1);
+    free_vector(net->db1);
+    free_matrix(net->dW2);
+    free_vector(net->db2);
+}
 
 int main() {
     double** train_images = load_mnist_images("./../dataset/train-images-idx3-ubyte");
@@ -45,6 +73,7 @@ int main() {
         Vector* t_batch  = create_label_batch(train_labels, batch_index, BATCH_SIZE);
 
         two_layer_net_gradient(net, x_batch, t_batch);
+        update_weight(net);
 
         if (i % iter_per_epoch == 0) {
             const double train_acc = two_layer_net_accuracy(net, train_images, train_labels, NUM_OF_TRAIN_IMAGES);

@@ -43,20 +43,6 @@ static double loss(TwoLayerNet* net, const Matrix* X, const Vector* t) {
     return v;
 }
 
-static void update_matrix(Matrix* A, const Matrix* dA) {
-    for (int i = 0; i < A->rows; ++i) {
-        for (int j = 0; j < A->cols; ++j) {
-            A->elements[i][j] -= (dA->elements[i][j] * LEARNING_RATE);
-        }
-    }
-}
-
-static void update_vector(Vector* v, const Vector* dv) {
-    for (int i = 0; i < v->size; ++i) {
-        v->elements[i] -= (dv->elements[i] * LEARNING_RATE);
-    }
-}
-
 void two_layer_net_gradient(TwoLayerNet* net, const Matrix* X, const Vector* t) {
     loss(net, X, t);
 
@@ -64,10 +50,6 @@ void two_layer_net_gradient(TwoLayerNet* net, const Matrix* X, const Vector* t) 
     Matrix* X2 = affine_backward(net->A2, X1);  
     Matrix* X3 = relu_backward(net->R, X2);  
     Matrix* X4 = affine_backward(net->A1, X3);  
-    update_matrix(net->W1, net->A1->dW);
-    update_vector(net->b1, net->A1->db);
-    update_matrix(net->W2, net->A2->dW);
-    update_vector(net->b2, net->A2->db);
 
     free_matrix(X1);
     free_matrix(X2);
