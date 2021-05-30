@@ -101,6 +101,11 @@ TEST(matrix_softmax, success) {
     free_matrix(N);
 }
 
+TEST(argmax, success) {
+    double v[] = {2, 1, 5, 3, -1};
+    EXPECT_EQ(2, argmax(v, 5));
+}
+
 TEST(vector_argmax, success) {
     Vector* v = create_vector(5);
     v->elements[0] = 2;

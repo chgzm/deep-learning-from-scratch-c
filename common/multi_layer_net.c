@@ -155,19 +155,6 @@ void multi_layer_net_gradient(MultiLayerNet* net, const Matrix* X, const Vector*
     free_matrix(X2);
 }
 
-static int _argmax(const double* v, int size) {
-    int index = 0;
-    double max = v[0];
-    for (int i = 1; i < size; ++i) {
-        if (max < v[i]) {
-            index = i;
-            max = v[i];
-        }
-    }
-
-    return index;
-}
-
 double multi_layer_net_accuracy(const MultiLayerNet* net, double** images, uint8_t* labels, int size) {
     Matrix* X = create_matrix(size, NUM_OF_PIXELS);
     for (int i = 0; i < size; ++i) {
@@ -179,7 +166,7 @@ double multi_layer_net_accuracy(const MultiLayerNet* net, double** images, uint8
     Matrix* Y = predict(net, X);
     int cnt = 0;
     for (int i = 0; i < Y->rows; ++i) {
-        const int max_index = _argmax(Y->elements[i], Y->cols);
+        const int max_index = argmax(Y->elements[i], Y->cols);
         if (max_index == labels[i]) {
             ++cnt;
         }

@@ -92,6 +92,19 @@ Matrix* matrix_softmax(const Matrix* M) {
     return N;
 }
 
+int argmax(const double* v, int size) {
+    int index = 0;
+    double max = v[0];
+    for (int i = 1; i < size; ++i) {
+        if (max < v[i]) {
+            index = i;
+            max = v[i];
+        }
+    }
+
+    return index;
+}
+
 int vector_argmax(const Vector* v) {
     int index = 0;
     double max = v->elements[0];

@@ -2,28 +2,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+
 #include <util.h>
 #include <debug.h>
 #include <mnist.h>
 #include <matrix.h>
+#include <function.h>
 
 #include "deep_convnet.h"
 
 static const int BATCH_SIZE = 100;
 static const int MAX_VIEW = 20;
-
-static int _argmax(const double* v, int size) {
-    int index = 0;
-    double max = v[0];
-    for (int i = 1; i < size; ++i) {
-        if (max < v[i]) {
-            index = i;
-            max = v[i];
-        }
-    }
-
-    return index;
-}
 
 static int plot_missclassified(int* miss_index, double**** test_images) {
     FILE* gp = popen("gnuplot -persist", "w");
@@ -107,7 +96,7 @@ int main() {
 
         Matrix* Y = deep_convnet_predict(net, x_batch, false);
         for (int j = 0; j < Y->rows; ++j) {
-            const int max_index = _argmax(Y->elements[j], Y->cols);
+            const int max_index = argmax(Y->elements[j], Y->cols);
             if (max_index == test_labels[i * BATCH_SIZE + j]) {
                 ++acc;
             } else if (miss_cnt < MAX_VIEW) {

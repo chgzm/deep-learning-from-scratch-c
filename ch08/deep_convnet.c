@@ -5,6 +5,7 @@
 #include <math.h>
 
 #include <mnist.h>
+#include <function.h>
 
 DeepConvNet* create_deep_convnet(int* input_dim, ConvParam* params, int hidden_size, int output_size) {
     DeepConvNet* net = malloc(sizeof(DeepConvNet));
@@ -160,19 +161,6 @@ void deep_convnet_gradient(DeepConvNet* net, Matrix4d* X, const Vector* t) {
     // TODO
 }
 
-static int _argmax(const double* v, int size) {
-    int index = 0;
-    double max = v[0];
-    for (int i = 1; i < size; ++i) {
-        if (max < v[i]) {
-            index = i;
-            max = v[i];
-        }
-    }
-
-    return index;
-}
-
 double deep_convnet_accuracy(const DeepConvNet* net, double**** images, uint8_t* labels, int size, int num_channels) {
     Matrix4d* X = create_matrix_4d(size, num_channels, NUM_OF_ROWS, NUM_OF_COLS);
     for (int i = 0; i < size; ++i) {
@@ -188,7 +176,7 @@ double deep_convnet_accuracy(const DeepConvNet* net, double**** images, uint8_t*
     Matrix* Y = deep_convnet_predict(net, X, false);
     int cnt = 0;
     for (int i = 0; i < Y->rows; ++i) {
-        const int max_index = _argmax(Y->elements[i], Y->cols);
+        const int max_index = argmax(Y->elements[i], Y->cols);
         if (max_index == labels[i]) {
             ++cnt;
         }
