@@ -12,11 +12,11 @@
 #include <trainer.h>
 #include <multi_layer_net_extend.h>
 
-#define OPTIMIZATION_TRIAL 100
-#define TRAIN_SIZE 400
-#define VALIDATION_NUM 100
-#define EPOCHS 50
-#define MINI_BATCH_SIZE 100
+static const int OPTIMIZATION_TRIAL = 100;
+static const int TRAIN_SIZE = 400;
+static const int VALIDATION_NUM = 100;
+static const int EPOCHS = 50;
+static const int MINI_BATCH_SIZE = 100;
 
 void __train(
     double** x_train, uint8_t* t_train, double** x_val, uint8_t* t_val, double lr, double weight_decay,

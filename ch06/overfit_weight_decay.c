@@ -11,12 +11,9 @@
 #include <multi_layer_net_extend.h>
 #include <optimizer.h>
 
-#define ITERS_NUM  2000
-#define TRAIN_SIZE 300
-#define BATCH_SIZE 100
-#define MAX_EPOCHS 201
-
-// const double weight_decay_lambda = 0;
+static const int TRAIN_SIZE = 300;
+static const int BATCH_SIZE = 100;
+static const int MAX_EPOCHS = 201;
 const double weight_decay_lambda = 0.1;
 
 int main() {
@@ -92,6 +89,8 @@ int main() {
     }
 
     fclose(fp);
+
+    plot_gpfile("plot_overfit_weight_decay.gp");
 
     return 0;   
 }

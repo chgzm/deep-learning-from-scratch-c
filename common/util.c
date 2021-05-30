@@ -84,3 +84,15 @@ double uniform(double start, double stop) {
     v *= (stop - start);
     return v + start;
 }
+
+void plot_gpfile(const char* file_path) {
+    FILE* gp = popen("gnuplot -persist", "w");
+    if (gp == NULL) {
+        fprintf(stderr, "Failed to open gnuplot pipe.\n");
+        return;
+    }
+    fprintf(gp, "load '%s'\n", file_path);
+    fflush(gp);
+    pclose(gp);
+}
+

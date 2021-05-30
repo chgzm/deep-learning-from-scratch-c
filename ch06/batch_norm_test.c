@@ -11,10 +11,9 @@
 #include <multi_layer_net_extend.h>
 #include <optimizer.h>
 
-#define ITERS_NUM  2000
-#define TRAIN_SIZE 1000
-#define BATCH_SIZE 100
-#define MAX_EPOCHS 20
+static const int TRAIN_SIZE = 1000;
+static const int BATCH_SIZE = 100;
+static const int MAX_EPOCHS = 20;
 
 static void process(double** train_images, uint8_t* train_labels) {
     double* weight_scale_list = logspace(0, -4, 16);
@@ -91,6 +90,8 @@ int main() {
 
     srand(time(NULL));
     process(train_images, train_labels);
+
+    plot_gpfile("plot_batch_norm_test.gp");
 
     return 0;   
 }

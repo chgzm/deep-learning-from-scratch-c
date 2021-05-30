@@ -7,12 +7,6 @@
 #include <function.h>
 #include "optimizer.h"
 
-#if 0
-static double f(double x, double y) {
-    return pow(x, 2) / 20.0 + pow(y, 2);
-}
-#endif
-
 static double df_x(double x) {
     return x / 10.0;
 }
@@ -140,6 +134,7 @@ int main() {
     run_Momentum();
     run_AdaGrad();
     run_Adam();
+    plot_gpfile("plot_optimization_naive.gp");
 
     return 0;   
 }

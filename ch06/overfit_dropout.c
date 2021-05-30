@@ -10,12 +10,11 @@
 #include <trainer.h>
 #include <multi_layer_net_extend.h>
 
-#define ITERS_NUM  2000
-#define TRAIN_SIZE 300
-#define MINI_BATCH_SIZE 100
-#define EPOCHS 301
-#define LEARNING_RATE 0.01
-#define DROPOUT_RATIO 0.2
+static const int TRAIN_SIZE = 300;
+static const int MINI_BATCH_SIZE = 100;
+static const int EPOCHS = 301;
+static const double LEARNING_RATE = 0.01;
+static const double DROPOUT_RATIO = 0.2;
 
 int main() {
     double** train_images = load_mnist_images("./../dataset/train-images-idx3-ubyte");
@@ -62,6 +61,8 @@ int main() {
     }
 
     fclose(fp);
+
+    plot_gpfile("plot_overfit_dropout.gp");
 
     return 0;   
 }

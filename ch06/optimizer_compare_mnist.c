@@ -8,8 +8,8 @@
 #include <multi_layer_net.h>
 #include <optimizer.h>
 
-#define ITERS_NUM  2000
-#define BATCH_SIZE 128
+static const int ITERS_NUM  = 2000;
+static const int BATCH_SIZE = 128;
 
 static void SGD_process(MultiLayerNet* net, double** train_images, uint8_t* train_labels, double** test_images, uint8_t* test_labels) { 
     const double lr = 0.01;
@@ -255,6 +255,8 @@ int main() {
     process(Momentum, train_images, train_labels, test_images, test_labels);
     process(AdaGrad,  train_images, train_labels, test_images, test_labels);
     process(Adam,     train_images, train_labels, test_images, test_labels);
+
+    plot_gpfile("optimization_compare_mnist.gp");
 
     return 0;   
 }

@@ -9,8 +9,8 @@
 #include <multi_layer_net.h>
 #include <optimizer.h>
 
-#define ITERS_NUM  2000
-#define BATCH_SIZE 128
+static const int ITERS_NUM  = 2000;
+static const int BATCH_SIZE = 128;
 
 static void process(int weight_init, double** train_images, uint8_t* train_labels, double** test_images, uint8_t* test_labels, double weight) {
     MultiLayerNet* net = create_multi_layer_net(784, 4, 100, 10, BATCH_SIZE, weight_init, weight, 0);
@@ -87,6 +87,8 @@ int main() {
     process(STD,    train_images, train_labels, test_images, test_labels, 0.01);
     process(Xavier, train_images, train_labels, test_images, test_labels, 0);
     process(He,     train_images, train_labels, test_images, test_labels, 0);
+
+    plot_gpfile("plot_weight_init_compare.gp");
 
     return 0;   
 }

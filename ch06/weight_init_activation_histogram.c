@@ -55,5 +55,7 @@ int main() {
 
     write_activations(activations);
 
+    plot_gpfile("plot_weight_init_activation_histogram.gp");
+
     return 0;   
 }

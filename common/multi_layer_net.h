@@ -35,7 +35,6 @@ MultiLayerNet* create_multi_layer_net(
 );
 
 void free_multi_layer_net(MultiLayerNet* net);
-
 void multi_layer_net_gradient(MultiLayerNet* net, const Matrix* X, const Vector* t);
 double multi_layer_net_loss(MultiLayerNet* net, const Matrix* X, const Vector* t);
 double multi_layer_net_accuracy(const MultiLayerNet* net, double** images, uint8_t* labels, int size);
