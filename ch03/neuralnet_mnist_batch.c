@@ -7,7 +7,7 @@
 
 int main() {
     double** images = load_mnist_images("./../dataset/t10k-images-idx3-ubyte");
-    uint8_t* labels = load_mnist_labels("./../dataset/t10k-labels-idx1-ubyte");
+    const uint8_t* labels = load_mnist_labels("./../dataset/t10k-labels-idx1-ubyte");
 
     Matrix* W1 = create_matrix(784, 50);
     if (init_matrix_from_file(W1, "./../dataset/W1.csv") != 0) {
@@ -46,9 +46,9 @@ int main() {
     }
 
     int accuracy_cnt = 0;
+    Vector* x = create_vector(NUM_OF_PIXELS);
     for (int i = 0; i < NUM_OF_TEST_IMAGES; ++i) {
-        Vector* x = create_vector(NUM_OF_PIXELS);
-        init_vector_from_array(x, images[i]);
+        x->elements = images[i];
 
         Vector* t1 = dot_vector_matrix(x, W1);
         Vector* a1 = add_vector(t1, b1);
@@ -64,7 +64,6 @@ int main() {
             ++accuracy_cnt;
         }
 
-        free_vector(x);
         free_vector(t1);
         free_vector(a1);
         free_vector(z1);
@@ -75,6 +74,7 @@ int main() {
         free_vector(a3);
         free_vector(y);
     }
+    free_vector(x);
 
     printf("Accuracy:%lf\n", (double)(accuracy_cnt) / NUM_OF_TEST_IMAGES);
 

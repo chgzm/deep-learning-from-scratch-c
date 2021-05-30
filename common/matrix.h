@@ -28,8 +28,11 @@ struct Matrix4d {
 
 Vector* create_vector(int size);
 Vector* create_vector_initval(int size, double init_val);
+Vector* create_vector_from_file(const char* file_path, int size);
 Matrix* create_matrix(int rows, int cols);
+Matrix* create_matrix_from_file(const char* file_path, int rows, int cols);
 Matrix4d* create_matrix_4d(int s1, int s2, int s3, int s4);
+Matrix4d* create_matrix_4d_from_file(const char* file_path, int s1, int s2, int s3, int s4);
 
 //
 // init

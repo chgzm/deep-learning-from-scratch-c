@@ -30,6 +30,16 @@ Vector* create_vector_initval(int size, double init_val) {
     return v;
 }
 
+Vector* create_vector_from_file(const char* file_path, int size) {
+    Vector* v = create_vector(size);
+    if (init_vector_from_file(v, file_path) != 0) {
+        fprintf(stderr, "Failed to init vector from file=%s\n", file_path);
+        return NULL;
+    }
+
+    return v;
+}
+
 Matrix* create_matrix(int rows, int cols) {
     Matrix* M = malloc(sizeof(Matrix));
     M->rows = rows;
@@ -37,6 +47,16 @@ Matrix* create_matrix(int rows, int cols) {
     M->elements = calloc(rows, sizeof(double*));
     for (int i = 0; i < rows; ++i) {
         M->elements[i] = calloc(cols, sizeof(double));
+    }
+
+    return M;
+}
+
+Matrix* create_matrix_from_file(const char* file_path, int rows, int cols) {
+    Matrix* M = create_matrix(rows, cols);
+    if (init_matrix_from_file(M, file_path) != 0) {
+        fprintf(stderr, "Failed to init matrix from file=%s\n", file_path); 
+        return NULL;
     }
 
     return M;
@@ -63,6 +83,15 @@ Matrix4d* create_matrix_4d(int s1, int s2, int s3, int s4) {
     return M;
 }
 
+Matrix4d* create_matrix_4d_from_file(const char* file_path, int s1, int s2, int s3, int s4) {
+    Matrix4d* M = create_matrix_4d(s1, s2, s3, s4);
+    if (init_matrix_4d_from_file(M, file_path) != 0) {
+        fprintf(stderr, "Failed to init matrix4d from file=%s\n", file_path); 
+        return NULL;
+    }
+
+    return M;
+}
 //
 // init
 //
