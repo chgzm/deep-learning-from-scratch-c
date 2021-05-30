@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+
 #include <util.h>
 #include <mnist.h>
 #include <matrix.h>
@@ -9,39 +10,39 @@ int main() {
     double** images = load_mnist_images("./../dataset/t10k-images-idx3-ubyte");
     const uint8_t* labels = load_mnist_labels("./../dataset/t10k-labels-idx1-ubyte");
 
-    Matrix* W1 = create_matrix(784, 50);
-    if (init_matrix_from_file(W1, "./data/W1.csv") != 0) {
-        fprintf(stderr, "Failed to load W1.csv\n");
+    Matrix* W1 = create_matrix_from_file("./data/W1.csv", 784, 50);
+    if (W1 == NULL) {
+        fprintf(stderr, "Failed to create W1\n");
         return -1;
     }
 
-    Matrix* W2 = create_matrix(50, 100);
-    if (init_matrix_from_file(W2, "./data/W2.csv") != 0) {
-        fprintf(stderr, "Failed to load W2.csv\n");
+    Matrix* W2 = create_matrix_from_file("./data/W2.csv", 50, 100);
+    if (W2 == NULL) {
+        fprintf(stderr, "Failed to create W2\n");
         return -1;
     }
 
-    Matrix* W3 = create_matrix(100, 10);
-    if (init_matrix_from_file(W3, "./data/W3.csv") != 0) {
-        fprintf(stderr, "Failed to load W3.csv\n");
+    Matrix* W3 = create_matrix_from_file("./data/W3.csv", 100, 10);
+    if (W3 == NULL) {
+        fprintf(stderr, "Failed to create W3\n");
         return -1;
     }
 
-    Vector* b1 = create_vector(50);
-    if (init_vector_from_file(b1, "./data/b1.csv") != 0) {
-        fprintf(stderr, "Failed to load b1.csv\n");
+    Vector* b1 = create_vector_from_file("./data/b1.csv", 50);
+    if (b1 == NULL) {
+        fprintf(stderr, "Failed to create b1\n");
         return -1;
     }
 
-    Vector* b2 = create_vector(100);
-    if (init_vector_from_file(b2, "./data/b2.csv") != 0) {
-        fprintf(stderr, "Failed to load b2.csv\n");
+    Vector* b2 = create_vector_from_file("./data/b2.csv", 100);
+    if (b2 == NULL) {
+        fprintf(stderr, "Failed to create b2\n");
         return -1;
     }
 
-    Vector* b3 = create_vector(10);
-    if (init_vector_from_file(b3, "./data/b3.csv") != 0) {
-        fprintf(stderr, "Failed to load b3.csv\n");
+    Vector* b3 = create_vector_from_file("./data/b3.csv", 10);
+    if (b3 == NULL) {
+        fprintf(stderr, "Failed to create b3\n");
         return -1;
     }
 
@@ -74,9 +75,16 @@ int main() {
         free_vector(a3);
         free_vector(y);
     }
-    free_vector(x);
 
     printf("Accuracy:%lf\n", (double)(accuracy_cnt) / NUM_OF_TEST_IMAGES);
+
+    free_vector(x);
+    free_matrix(W1);
+    free_matrix(W2);
+    free_matrix(W3);
+    free_vector(b1);
+    free_vector(b2);
+    free_vector(b3);
 
     return 0;
 }
