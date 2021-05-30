@@ -60,7 +60,7 @@ int main() {
         Vector* a3 = add_vector(t3, b3);
         Vector* y  = vector_softmax(a3);
 
-        if (argmax(y) == labels[i]) {
+        if (vector_argmax(y) == labels[i]) {
             ++accuracy_cnt;
         }
 

@@ -12,7 +12,7 @@ Matrix* sigmoid_grad(const Matrix* M);
 Vector* vector_softmax(const Vector* v);
 Matrix* matrix_softmax(const Matrix* M);
 
-int argmax(const Vector* v);
-int* argmax_row(const Matrix* M);
+int vector_argmax(const Vector* v);
+int* matrix_argmax_row(const Matrix* M);
 
 #endif

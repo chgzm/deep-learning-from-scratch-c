@@ -713,7 +713,7 @@ Matrix4d* pooling_forward(Pooling* P, Matrix4d* X) {
     if (P->arg_max != NULL) {
         free(P->arg_max);
     }
-    P->arg_max = argmax_row(col); 
+    P->arg_max = matrix_argmax_row(col); 
 
     Vector* tmp2 = matrix_row_max(col);
 

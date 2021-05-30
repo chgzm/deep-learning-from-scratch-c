@@ -101,21 +101,21 @@ TEST(matrix_softmax, success) {
     free_matrix(N);
 }
 
-TEST(argmax, success) {
+TEST(vector_argmax, success) {
     Vector* v = create_vector(5);
     v->elements[0] = 2;
     v->elements[1] = 1;
     v->elements[2] = 5;
     v->elements[3] = 3;
 
-    EXPECT_EQ(2, argmax(v));
+    EXPECT_EQ(2, vector_argmax(v));
 
     free_vector(v);
 }
 
-TEST(argmax_row, success) {
+TEST(matrix_argmax_row, success) {
     Matrix* M = create_matrix_from_stdvec({{1, 2, 3}, {4, 6, 5}, {9, 8, 7}});
-    int* arg_max = argmax_row(M);
+    int* arg_max = matrix_argmax_row(M);
 
     int ans[] = {2, 1, 0};
     for (int i = 0; i < M->rows; ++i) {

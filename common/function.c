@@ -92,7 +92,7 @@ Matrix* matrix_softmax(const Matrix* M) {
     return N;
 }
 
-int argmax(const Vector* v) {
+int vector_argmax(const Vector* v) {
     int index = 0;
     double max = v->elements[0];
     for (int i = 1; i < v->size; ++i) {
@@ -105,7 +105,7 @@ int argmax(const Vector* v) {
     return index;
 }
 
-int* argmax_row(const Matrix* M) {
+int* matrix_argmax_row(const Matrix* M) {
     int* arg_max = (int*)malloc(sizeof(int) * M->rows);
 
     for (int i = 0; i < M->rows; ++i) {
