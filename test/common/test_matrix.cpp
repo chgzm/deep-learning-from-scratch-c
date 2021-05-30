@@ -43,7 +43,6 @@ TEST(create_vector_from_file, success) {
     free_vector(v);
 }
 
-
 TEST(create_matrix, success) {
     const int rows = 2;
     const int cols = 3;
@@ -92,12 +91,11 @@ TEST(create_matrix_4d, success) {
 }
 
 TEST(init_vector_from_file, success) {
-    Vector* v = create_vector(50);
+    Vector* v = create_vector(5);
+    EXPECT_EQ(0, init_vector_from_file(v, "./data/v.csv"));
 
-    EXPECT_EQ(0, init_vector_from_file(v, "../../dataset/b1.csv"));
-
-    EXPECT_DOUBLE_EQ(-0.067503154277801513671875, v->elements[0]);
-    EXPECT_DOUBLE_EQ(0.10716812312602996826171875, v->elements[49]);
+    const std::vector<double> ans = {1, 2, 3, 4, 5};
+    EXPECT_VECTOR_EQ(ans, v);
 
     free_vector(v);
 }
@@ -126,11 +124,11 @@ TEST(create_matrix_4d_from_file, success) {
 }
 
 TEST(init_matrix_from_file, success) {
-    Matrix* M = create_matrix(50, 100);
-    EXPECT_EQ(0, init_matrix_from_file(M, "../../dataset/W2.csv"));
+    Matrix* M = create_matrix(2, 3);
+    EXPECT_EQ(0, init_matrix_from_file(M, "./data/W.csv"));
 
-    EXPECT_DOUBLE_EQ(-0.10694038867950439453125,  M->elements[0][0]);
-    EXPECT_DOUBLE_EQ(0.009080098010599613189697265625, M->elements[49][99]);
+    std::vector<std::vector<double>> ans = {{1, 2, 3}, {4, 5, 6}};
+    EXPECT_MATRIX_EQ(ans, M);
 
     free_matrix(M);
 }
@@ -160,32 +158,30 @@ TEST(init_matrix_4d_from_file, success) {
 }
 
 TEST(copy_vector, success) {
-    Vector* v = create_vector(50);
-    EXPECT_EQ(0, init_vector_from_file(v, "../../dataset/b1.csv"));
+    Vector* v = create_vector(5);
+    EXPECT_EQ(0, init_vector_from_file(v, "./data/v.csv"));
 
-    Vector* v2 = create_vector(50);
+    Vector* v2 = create_vector(5);
     copy_vector(v2, v);
 
-    EXPECT_EQ(v->size, v2->size);
-    EXPECT_DOUBLE_EQ(-0.067503154277801513671875, v2->elements[0]);
-    EXPECT_DOUBLE_EQ(0.10716812312602996826171875, v2->elements[49]);
+    const std::vector<double> ans = {1, 2, 3, 4, 5};
+    EXPECT_VECTOR_EQ(ans, v);
+    EXPECT_VECTOR_EQ(ans, v2);
 
     free_vector(v);
     free_vector(v2);
 }
 
 TEST(copy_matrix, success) {
-    Matrix* M = create_matrix(50, 100);
-    EXPECT_EQ(0, init_matrix_from_file(M, "../../dataset/W2.csv"));
+    Matrix* M = create_matrix(2, 3);
+    EXPECT_EQ(0, init_matrix_from_file(M, "./data/W.csv"));
 
-    Matrix* M2 = create_matrix(50, 100);
+    Matrix* M2 = create_matrix(2, 3);
     copy_matrix(M2, M);
 
-    EXPECT_EQ(M->rows, M2->rows);
-    EXPECT_EQ(M->cols, M2->cols);
-
-    EXPECT_DOUBLE_EQ(-0.10694038867950439453125,  M2->elements[0][0]);
-    EXPECT_DOUBLE_EQ(0.009080098010599613189697265625, M2->elements[49][99]);
+    std::vector<std::vector<double>> ans = {{1, 2, 3}, {4, 5, 6}};
+    EXPECT_MATRIX_EQ(ans, M);
+    EXPECT_MATRIX_EQ(ans, M2);
 
     free_matrix(M);
     free_matrix(M2);

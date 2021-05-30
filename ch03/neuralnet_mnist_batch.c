@@ -10,37 +10,37 @@ int main() {
     const uint8_t* labels = load_mnist_labels("./../dataset/t10k-labels-idx1-ubyte");
 
     Matrix* W1 = create_matrix(784, 50);
-    if (init_matrix_from_file(W1, "./../dataset/W1.csv") != 0) {
+    if (init_matrix_from_file(W1, "./data/W1.csv") != 0) {
         fprintf(stderr, "Failed to load W1.csv\n");
         return -1;
     }
 
     Matrix* W2 = create_matrix(50, 100);
-    if (init_matrix_from_file(W2, "./../dataset/W2.csv") != 0) {
+    if (init_matrix_from_file(W2, "./data/W2.csv") != 0) {
         fprintf(stderr, "Failed to load W2.csv\n");
         return -1;
     }
 
     Matrix* W3 = create_matrix(100, 10);
-    if (init_matrix_from_file(W3, "./../dataset/W3.csv") != 0) {
+    if (init_matrix_from_file(W3, "./data/W3.csv") != 0) {
         fprintf(stderr, "Failed to load W3.csv\n");
         return -1;
     }
 
     Vector* b1 = create_vector(50);
-    if (init_vector_from_file(b1, "./../dataset/b1.csv") != 0) {
+    if (init_vector_from_file(b1, "./data/b1.csv") != 0) {
         fprintf(stderr, "Failed to load b1.csv\n");
         return -1;
     }
 
     Vector* b2 = create_vector(100);
-    if (init_vector_from_file(b2, "./../dataset/b2.csv") != 0) {
+    if (init_vector_from_file(b2, "./data/b2.csv") != 0) {
         fprintf(stderr, "Failed to load b2.csv\n");
         return -1;
     }
 
     Vector* b3 = create_vector(10);
-    if (init_vector_from_file(b3, "./../dataset/b3.csv") != 0) {
+    if (init_vector_from_file(b3, "./data/b3.csv") != 0) {
         fprintf(stderr, "Failed to load b3.csv\n");
         return -1;
     }
