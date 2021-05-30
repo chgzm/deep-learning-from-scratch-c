@@ -47,7 +47,8 @@ int main() {
     }
 
     int accuracy_cnt = 0;
-    Vector* x = create_vector(NUM_OF_PIXELS);
+    Vector* x = malloc(sizeof(Vector));
+    x->size = NUM_OF_PIXELS;
     for (int i = 0; i < NUM_OF_TEST_IMAGES; ++i) {
         x->elements = images[i];
 
@@ -78,7 +79,7 @@ int main() {
 
     printf("Accuracy:%lf\n", (double)(accuracy_cnt) / NUM_OF_TEST_IMAGES);
 
-    free_vector(x);
+    free(x);
     free_matrix(W1);
     free_matrix(W2);
     free_matrix(W3);
