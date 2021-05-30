@@ -9,10 +9,6 @@ struct SimpleConvNet {
     Convolution* C;
     Relu4d*      R4d;
     Pooling*     P;
-    Matrix4d*    W0;
-    Matrix*      W1;
-    Matrix*      W2;
-    Vector*      b[3];
     Relu*        R;
     Affine*      A[2];
     SoftmaxWithLoss* S;

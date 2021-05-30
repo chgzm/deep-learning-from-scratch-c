@@ -24,32 +24,32 @@ SimpleConvNet* create_simple_convnet(
     const int conv_output_size = (input_size - filter_size + 2 * pad) / stride + 1;
     const int pool_output_size = (int)(filter_num * (conv_output_size / 2.0) * (conv_output_size /2.0));
    
-    net->W0 = create_matrix_4d(filter_num, input_dim1, filter_size, filter_size);
-    net->b[0] = create_vector(filter_num);
+    Matrix4d* W0 = create_matrix_4d(filter_num, input_dim1, filter_size, filter_size);
+    Vector* b0 = create_vector(filter_num);
 
-    net->W1 = create_matrix(pool_output_size, hidden_size);
-    net->b[1] = create_vector(hidden_size);
+    Matrix* W1 = create_matrix(pool_output_size, hidden_size);
+    Vector* b1 = create_vector(hidden_size);
 
-    net->W2 = create_matrix(hidden_size, output_size);
-    net->b[2] = create_vector(output_size);
+    Matrix* W2 = create_matrix(hidden_size, output_size);
+    Vector* b2 = create_vector(output_size);
 
-    net->C    = create_convolution(net->W0, net->b[0], stride, pad);
+    net->C    = create_convolution(W0, b0, stride, pad);
     net->R4d  = create_relu_4d();
     net->P    = create_pooling(2, 2, 2, 0);
-    net->A[0] = create_affine(net->W1, net->b[1]);
+    net->A[0] = create_affine(W1, b1);
     net->R    = create_relu();
-    net->A[1] = create_affine(net->W2, net->b[2]);
+    net->A[1] = create_affine(W2, b2);
     net->S    = create_softmax_with_loss();
 
     // init weight
-    init_matrix_4d_random(net->W0); 
-    scalar_matrix_4d(net->W0, weight);
+    init_matrix_4d_random(net->C->W); 
+    scalar_matrix_4d(net->C->W, weight);
     
-    init_matrix_random(net->W1);
-    scalar_matrix(net->W1, weight);
+    init_matrix_random(net->A[0]->W);
+    scalar_matrix(net->A[0]->W, weight);
 
-    init_matrix_random(net->W2);
-    scalar_matrix(net->W2, weight);
+    init_matrix_random(net->A[1]->W);
+    scalar_matrix(net->A[1]->W, weight);
 
     return net;
 }

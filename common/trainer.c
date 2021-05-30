@@ -283,14 +283,14 @@ static void simple_convnet_trainer_train_step(SimpleConvNetTrainer* trainer, int
 
     switch (trainer->optimizer_type) {
     case SGD: {
-        SGD_update_vector(trainer->net->b[0], trainer->net->C->db, trainer->learning_rate);
-        SGD_update_matrix_4d(trainer->net->W0, trainer->net->C->dW, trainer->learning_rate);
+        SGD_update_vector(trainer->net->C->b, trainer->net->C->db, trainer->learning_rate);
+        SGD_update_matrix_4d(trainer->net->C->W, trainer->net->C->dW, trainer->learning_rate);
 
-        SGD_update_vector(trainer->net->b[1], trainer->net->A[0]->db, trainer->learning_rate);
-        SGD_update_matrix(trainer->net->W1, trainer->net->A[0]->dW, trainer->learning_rate);
+        SGD_update_vector(trainer->net->A[0]->b, trainer->net->A[0]->db, trainer->learning_rate);
+        SGD_update_matrix(trainer->net->A[0]->W, trainer->net->A[0]->dW, trainer->learning_rate);
 
-        SGD_update_vector(trainer->net->b[2], trainer->net->A[1]->db, trainer->learning_rate);
-        SGD_update_matrix(trainer->net->W2, trainer->net->A[1]->dW, trainer->learning_rate);
+        SGD_update_vector(trainer->net->A[1]->b, trainer->net->A[1]->db, trainer->learning_rate);
+        SGD_update_matrix(trainer->net->A[1]->W, trainer->net->A[1]->dW, trainer->learning_rate);
 
         break;
     }
@@ -298,14 +298,14 @@ static void simple_convnet_trainer_train_step(SimpleConvNetTrainer* trainer, int
         static const double beta1 = 0.9;
         static const double beta2 = 0.999;
 
-        Adam_update_vector(trainer->net->b[0],  trainer->net->C->db,    trainer->learning_rate, beta1, beta2, u1, u2, iter_num);
-        Adam_update_matrix_4d(trainer->net->W0, trainer->net->C->dW,    trainer->learning_rate, beta1, beta2, m1, m2, iter_num);
+        Adam_update_vector(trainer->net->C->b,  trainer->net->C->db,    trainer->learning_rate, beta1, beta2, u1, u2, iter_num);
+        Adam_update_matrix_4d(trainer->net->C->W, trainer->net->C->dW,    trainer->learning_rate, beta1, beta2, m1, m2, iter_num);
 
-        Adam_update_vector(trainer->net->b[1],  trainer->net->A[0]->db, trainer->learning_rate, beta1, beta2, v1, v2, iter_num);
-        Adam_update_matrix(trainer->net->W1,    trainer->net->A[0]->dW, trainer->learning_rate, beta1, beta2, n1, n2, iter_num);
+        Adam_update_vector(trainer->net->A[0]->b,  trainer->net->A[0]->db, trainer->learning_rate, beta1, beta2, v1, v2, iter_num);
+        Adam_update_matrix(trainer->net->A[0]->W,  trainer->net->A[0]->dW, trainer->learning_rate, beta1, beta2, n1, n2, iter_num);
 
-        Adam_update_vector(trainer->net->b[2],  trainer->net->A[1]->db, trainer->learning_rate, beta1, beta2, w1, w2, iter_num);
-        Adam_update_matrix(trainer->net->W2,    trainer->net->A[1]->dW, trainer->learning_rate, beta1, beta2, o1, o2, iter_num);
+        Adam_update_vector(trainer->net->A[1]->b,  trainer->net->A[1]->db, trainer->learning_rate, beta1, beta2, w1, w2, iter_num);
+        Adam_update_matrix(trainer->net->A[1]->W,  trainer->net->A[1]->dW, trainer->learning_rate, beta1, beta2, o1, o2, iter_num);
 
         break;
     }
@@ -344,29 +344,29 @@ static void simple_convnet_trainer_train_step(SimpleConvNetTrainer* trainer, int
 void simple_convnet_trainer_train(SimpleConvNetTrainer* trainer) {
     if (trainer->optimizer_type == Adam) {
         m1 = create_matrix_4d(
-            trainer->net->W0->sizes[0], 
-            trainer->net->W0->sizes[1], 
-            trainer->net->W0->sizes[2], 
-            trainer->net->W0->sizes[3]
+            trainer->net->C->W->sizes[0], 
+            trainer->net->C->W->sizes[1], 
+            trainer->net->C->W->sizes[2], 
+            trainer->net->C->W->sizes[3]
         );
         m2 = create_matrix_4d(
-            trainer->net->W0->sizes[0], 
-            trainer->net->W0->sizes[1], 
-            trainer->net->W0->sizes[2], 
-            trainer->net->W0->sizes[3]
+            trainer->net->C->W->sizes[0], 
+            trainer->net->C->W->sizes[1], 
+            trainer->net->C->W->sizes[2], 
+            trainer->net->C->W->sizes[3]
         );
 
-        n1 = create_matrix(trainer->net->W1->rows, trainer->net->W1->cols); 
-        n2 = create_matrix(trainer->net->W1->rows, trainer->net->W1->cols); 
-        o1 = create_matrix(trainer->net->W2->rows, trainer->net->W2->cols); 
-        o2 = create_matrix(trainer->net->W2->rows, trainer->net->W2->cols); 
+        n1 = create_matrix(trainer->net->A[0]->W->rows, trainer->net->A[0]->W->cols); 
+        n2 = create_matrix(trainer->net->A[0]->W->rows, trainer->net->A[0]->W->cols); 
+        o1 = create_matrix(trainer->net->A[1]->W->rows, trainer->net->A[1]->W->cols); 
+        o2 = create_matrix(trainer->net->A[1]->W->rows, trainer->net->A[1]->W->cols); 
 
-        u1 = create_vector(trainer->net->b[0]->size);  
-        u2 = create_vector(trainer->net->b[0]->size);  
-        v1 = create_vector(trainer->net->b[1]->size);  
-        v2 = create_vector(trainer->net->b[1]->size);  
-        w1 = create_vector(trainer->net->b[2]->size);  
-        w2 = create_vector(trainer->net->b[2]->size);  
+        u1 = create_vector(trainer->net->C->b->size);  
+        u2 = create_vector(trainer->net->C->b->size);  
+        v1 = create_vector(trainer->net->A[0]->b->size);  
+        v2 = create_vector(trainer->net->A[0]->b->size);  
+        w1 = create_vector(trainer->net->A[1]->b->size);  
+        w2 = create_vector(trainer->net->A[1]->b->size);  
     }
 
     for (int i = 0; i < trainer->max_iter; ++i) {
