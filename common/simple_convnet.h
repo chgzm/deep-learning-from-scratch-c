@@ -28,7 +28,7 @@ SimpleConvNet* create_simple_convnet(
 );
 
 void free_simple_convnet(SimpleConvNet* net);
-
+int simple_convnet_load_params(SimpleConvNet* net);
 double simple_convnet_loss(SimpleConvNet* net, Matrix4d* X, const Vector* t);
 void simple_convnet_gradient(SimpleConvNet* net, Matrix4d* X, const Vector* t);
 double simple_convnet_accuracy(const SimpleConvNet* net, double**** images, uint8_t* labels, int size, int num_channels);

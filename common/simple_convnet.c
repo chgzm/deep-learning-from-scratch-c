@@ -69,6 +69,18 @@ void free_simple_convnet(SimpleConvNet* net) {
     free(net); 
 }
 
+int simple_convnet_load_params(SimpleConvNet* net) {
+    if (init_matrix_4d_from_file(net->C->W, "./data/W1.csv")) { fprintf(stderr, "Failed to load ./data/W1.csv\n"); }
+    if (init_matrix_from_file(net->A[0]->W, "./data/W2.csv")) { fprintf(stderr, "Failed to load ./data/W2.csv\n"); }
+    if (init_matrix_from_file(net->A[1]->W, "./data/W3.csv")) { fprintf(stderr, "Failed to load ./data/W3.csv\n"); }
+
+    if (init_vector_from_file(net->C->b,    "./data/b1.csv")) { fprintf(stderr, "Failed to load ./data/b1.csv\n"); }
+    if (init_vector_from_file(net->A[0]->b, "./data/b2.csv")) { fprintf(stderr, "Failed to load ./data/b2.csv\n"); }
+    if (init_vector_from_file(net->A[1]->b, "./data/b3.csv")) { fprintf(stderr, "Failed to load ./data/b3.csv\n"); }
+
+    return 0; 
+}
+
 static Matrix* predict(const SimpleConvNet* net, Matrix4d* X) {
     Matrix4d* T  = convolution_forward(net->C, X);
     Matrix4d* T2 = relu_4d_forward(net->R4d, T);
