@@ -13,5 +13,21 @@ In order to make it easier to understand, I have implemented it in a straightfor
 ## Requirements
 You need gnuplot to draw graphs and GoogleTest to run tests.
 
-## Build
-Go to the folder for each chapter and execute `make` 
+## Build and run
+Go to the folder for each chapter and execute `make` , and run binary.
+
+Example:
+
+```
+$ cd ch05
+$ make
+$ ./train_neuralnet 
+train acc, test acc | 0.129067, 0.132400
+train acc, test acc | 0.901400, 0.906300
+train acc, test acc | 0.921300, 0.925100
+train acc, test acc | 0.938067, 0.938500
+train acc, test acc | 0.945933, 0.944400
+train acc, test acc | 0.951583, 0.949100
+train acc, test acc | 0.957733, 0.952500
+...
+```
